@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home - Visit Altamura
+{% endblock %}
+
+
+{% block content %}
+<section class="hero-home">
+    <div class="container-xl hero-content-wrapper">
+
+        <div class="py-5">
+            <span class="hero-badge mb-3 reveal reveal-delay-1">
+                <i class="bi bi-geo-alt-fill icon"></i>
+                ALTAMURA, APULIA
+            </span>
+
+            <h1 class="hero-title mt-3 reveal reveal-delay-2">
+                Walk slowly.<br>
+                <span class="reveal reveal-delay-3">Discover deeply.</span>
+            </h1>
+
+            <p class="hero-text mt-3 reveal reveal-delay-4">
+                Walk through centuries of stories and explore its historic streets, traditions and hidden
+                corners through authentic free walking tours.
+            </p>
+
+            <div class="d-flex flex-wrap gap-3 mt-4 reveal reveal-delay-5">
+                <a class="btn btn-brand btn-lg" href="#tours">
+                    <i class="bi bi-map me-1"></i>
+                    Explore tours
+                </a>
+
+                <a class="btn btn-outline-brand btn-lg" href="#our-city">
+
+                    <i class="bi bi-buildings me-1"></i>
+                    Discover the city
+                </a>
+            </div>
+            <div class="hero-note align-items-center d-flex gap-2 mt-4 reveal reveal-delay-6"> <i
+                    class="bi bi-heart"></i> No fixed fee. Reward your guide after the experience.
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="row g-0 m-0">
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_tours | default(0) }}</strong>
+            <span>CURATED TOURS</span>
+        </article>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_guides | default(0) }}</strong>
+            <span>LOCAL GUIDES</span>
+        </article>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_guide_languages | default(0)
+                }}</strong> <span>LANGUAGES OFFERED</span> </article>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_reservations | default(0)
+                }}</strong> <span>ACTIVE RESERVATIONS</span> </article>
+    </div>
+</section>
+
+<section class="section" id="tours">
+    <div class="container-xl">
+        <div class="section-title reveal reveal-delay-1">
+            <div>
+                <p class="section-badge">Follow your feelings</p>
+                <h2>A walk for every kind<br>of <span>curiosity.</span></h2>
+            </div>
+        </div>
+
+        <form class="filters reveal reveal-delay-2" action="{{ url_for('home') }}#tours" method="get">
+            <div class="filter">
+                <label for="filterDate"><i class="bi bi-calendar3"></i><span>DATE</span></label>
+                <input class="form-control" id="filterDate" name="date" type="date" value="{{ selected_date }}"
+                    min="{{ today }}">
+            </div>
+            <div class="filter">
+                <label for="filterLanguage"><i class="bi bi-translate"></i><span>LANGUAGE</span></label>
+                <select class="form-select" id="filterLanguage" name="language">
+                    <option value="">Any language</option>
+                    {% for language in p_guide_languages %}
+                    <option value="{{ language }}" {% if selected_language==language %}selected{% endif %}>{{ language
+                        }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter">
+                <label for="filterDuration"><i class="bi bi-hourglass-split"></i><span>DURATION</span></label>
+                <select class="form-select" id="filterDuration" name="duration">
+                    <option value="">Any duration</option>
+                    <option value="short" {% if selected_duration=='short' %}selected{% endif %}>Short · up to 90 min
+                    </option>
+                    <option value="medium" {% if selected_duration=='medium' %}selected{% endif %}>Medium · 91–150
+                        min</option>
+                    <option value="long" {% if selected_duration=='long' %}selected{% endif %}>Long · over 150 min
+                    </option>
+                </select>
+            </div>
+            <div class="filter-button">
+                <button class="btn btn-brand" type="submit"><i class="bi bi-sliders2"></i> Apply filters</button>
+                {% if p_filter_date or p_filter_language or p_filter_duration %}
+                <a class="clear-filter" href="{{ url_for('home') }}#tours">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="tour-count reveal reveal-delay-3">
+            <span>{{ p_tours|length }}</span> EXPERIENCE{% if p_tours|length != 1 %}S{% endif %} READY TO EXPLORE
+        </div>
+
+        {% if p_tours %}
+        <section class="row g-4 reveal reveal-delay-4">
+            {% for tour in p_tours %}
+            <article class="col-12 col-md-6 col-xl-4">
+                <a class="tour-card" href="#">
+                    {% if tour.path_img %}
+                    <img class="tour-card-img" src="{{ url_for('static', filename=tour.path_img) }}"
+                        alt="{{ tour.title }} image">
+                    <!--                    <img class="tour-card-img" src="{{ url_for('static', filename='/images/tours/' + tour.path_img) }}"
+                        alt="{{ tour.title }} image">-->
+                    {% else %}
+                    <div class="tour-card-placeholder">
+                        <i class="bi bi-map"></i>
+                    </div>
+                    {% endif %}
+
+                    <div class="tour-card-overlay">
+                    </div>
+
+                    <div class="tour-card-badge">
+                        <span>
+                            <i class="bi bi-translate"></i>
+                            {{ tour.language }}
+                        </span>
+                    </div>
+
+                    <div class="tour-card-body">
+                        <p class="tour-card-guide">
+                            By {{ tour.first_name }} {{ tour.last_name }}
+                        </p>
+
+                        <h3 class="tour-card-title">
+                            {{ tour.title }}
+                        </h3>
+
+                        <div class="tour-card-info-wrapper">
+                            <span class="tour-card-info">
+                                <i class="bi bi-clock"></i>
+                                {{ tour.duration }} min
+                            </span>
+
+                            <span class="tour-card-info">
+                                <i class="bi bi-people"></i>
+
+                                Max {{ tour.max_participants }}
+                            </span>
+
+                            {% if tour.day_of_week %}
+                            <span class="tour-card-info">
+                                <i class="bi bi-calendar3"></i>
+                                {{ tour.day_of_week | replace('-', '/') }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </article>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="no-found reveal reveal-delay-4">
+            <i class="bi bi-search no-found-icon"></i>
+            <h3 class="fs-2 mb-2"> No tours found </h3>
+            <p class="mb-3"> Try adjusting the date, duration or language filter. </p>
+            <a class="btn btn-brand" href="{{ url_for('home') }}#tours"> Show all tours </a>
+        </section>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section our-city-section" id="our-city">
+    <div class="container-xl">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5 reveal reveal-delay-1">
+                <p class="section-badge">About Altamura</p>
+                <h2>A city carved<br>in <span>stone and time.</span></h2>
+                <p class="section-text mt-3">
+                    Altamura is a city of the Alta Murgia, known for its Cathedral
+                    commissioned by Frederick II, the karst landscape of the Pulo di
+                    Altamura and its famous Pane di Altamura DOP. The city blends
+                    history, gastronomy and breathtaking landscapes.
+                </p>
+                <ul class="city-facts mt-4">
+                    <li><i class="bi bi-building-check"></i> Cathedral commissioned by Frederick II</li>
+                    <li><i class="bi bi-award"></i> Pane di Altamura — DOP protected product</li>
+                    <li><i class="bi bi-tree"></i> Pulo di Altamura — karst depression</li>
+                    <li><i class="bi bi-person-arms-up"></i> Altamura Man — Neanderthal remains from Lamalunga Cave
+                    </li>
+                </ul>
+                <a class="btn btn-brand mt-4" href="#tours">
+                    <i class="bi bi-map me-1"></i>Explore our tours
+                </a>
+            </div>
+
+            <div class="col-lg-7 reveal reveal-delay-2">
+                <div class="city-img-grid">
+                    <img src="{{ url_for('static', filename='images/tours/cathedral.webp') }}"
+                        alt="Cattedrale di Altamura" class="city-img city-img-main">
+                    <img src="{{ url_for('static', filename='images/tours/claustri.webp') }}"
+                        alt="Chiostri del centro storico" class="city-img city-img-sm-1">
+                    <img src="{{ url_for('static', filename='images/tours/pane-altamura.webp') }}"
+                        alt="Pane DOP di Altamura" class="city-img city-img-sm-2">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="how-it-works">
+    <div class="container">
+        <div class="justify-content-center text-center mb-5">
+            <div class="section-badge mx-auto mb-3 reveal">The concept</div>
+            <h2 class="reveal">Simple. Free. Memorable.</h2>
+            <div class="section-divider mx-auto mt-3 reveal"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-3">
+                <article class="step-card reveal">
+                    <span class="step-card-icon"><i class="bi bi-search icon"></i></span>
+                    <h4>Discover</h4>
+                    <p>Browse recurring tours led by passionate local guides.</p>
+                </article>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <article class="step-card reveal">
+                    <span class="step-card-icon"><i class="bi bi-calendar-check icon"></i></span>
+                    <h4>Reserve</h4>
+                    <p>Choose an available date and secure your place for free.</p>
+                </article>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <article class="step-card reveal">
+                    <span class="step-card-icon"><i class="bi bi-person-walking icon"></i></span>
+                    <h4>Walk</h4>
+                    <p>Meet your guide and explore the stories of Altamura.</p>
+                </article>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <article class="step-card reveal">
+                    <span class="step-card-icon"><i class="bi bi-heart icon"></i></span>
+                    <h4>Tip</h4>
+                    <p>Loved the experience? Reward your guide at the end of the walk.</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 pt-2 reveal">
+            <a href="{{ url_for('signup', role='participant') }}" class="btn btn-brand btn-lg">
+                Start Exploring — It's Free
+            </a>
+            <p class="text-muted small mt-3">
+                Already have an account?
+                <a href="{{ url_for('login') }}" class="link-brand">Sign in →</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="section-cta-wrapper">
+    <div class="container-xl section-cta reveal">
+        <div>
+            <p class="section-badge">Share your point of view</p>
+            <h2>Know a story worth walking?</h2>
+            <p>Create your own recurring tour, shape its itinerary and guide curious visitors through your Altamura.</p>
+        </div>
+        {% if current_user.is_authenticated and current_user.role == 'guide' %}
+        <a class="btn btn-light btn-lg" href="{{ url_for('new_tour') }}">Create a tour <i
+                class="bi bi-arrow-right"></i></a>
+        {% else %}
+        <a class="btn btn-light btn-lg" href="{{ url_for('signup', role='guide') }}">Become a local guide <i
+                class="bi bi-arrow-right"></i></a>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

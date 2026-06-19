@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ p_tour.title }} - VisitAltamura{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    {% if p_images %}
+    <div id="tourDetailCarousel" class="carousel slide detail-hero-carousel" data-bs-ride="false">
+        <div class="carousel-inner">
+            {% for img in p_images %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="{{ url_for('static', filename=img.path_img) }}" class="detail-hero-image"
+                    alt="{{ p_tour.title }} — photo {{ loop.index }}">
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if p_images|length > 1 %}
+        <button class="carousel-control-prev" type="button" data-bs-target="#tourDetailCarousel" data-bs-slide="prev"
+            aria-label="Previous image">
+
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+
+        <button class="carousel-control-next" type="button" data-bs-target="#tourDetailCarousel" data-bs-slide="next"
+            aria-label="Next image">
+
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+
+        <div class="carousel-indicators">
+            {% for img in p_images %}
+            <button type="button" data-bs-target="#tourDetailCarousel" data-bs-slide-to="{{ loop.index0 }}"
+                class="{% if loop.first %}active{% endif %}" {% if loop.first %}aria-current="true" {% endif %}
+                aria-label="Show image {{ loop.index }}">
+            </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+
+    <a class="breadcrumb-link" href="{{ url_for('home') }}#tours"><i class="bi bi-arrow-left"></i> Back to tours</a>
+    <div class="row g-4 align-items-end mt-2">
+        <div class="col-lg-8">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="detail-pill"><i class="bi bi-translate"></i>{{ p_tour.language }}</span>
+                <span class="detail-pill"><i class="bi bi-clock"></i>{{ p_tour.duration }} min</span>
+                <span class="detail-pill"><i class="bi bi-people"></i>Max {{ p_tour.max_participants }}</span>
+            </div>
+            <h1>{{ p_tour.title }}</h1>
+            <p class="detail-lead">{{ p_tour.description }}</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <p class="detail-guide mb-1">YOUR LOCAL GUIDE</p>
+            <p class="h4 mb-0">{{ p_tour.first_name }} {{ p_tour.last_name }}</p>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

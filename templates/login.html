@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Visit Altamura{% endblock %}
+
+{% block content %}
+<section class="section login-section">
+    <div class="container-xl">
+        <div class="login-card">
+            <div class="login-title">
+                <p class="section-badge">Welcome back</p>
+                <h1>Login to your<br><span>VisitAltamura account.</span></h1>
+                <p>Enter your credentials to manage your tours or review your reservations.</p>
+            </div>
+
+            <form class="form-card" method="post" action="{{ url_for('authenticate') }}">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email address</label>
+                    <input class="form-control" id="email" name="email" type="email" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-control" id="password" name="password" type="password" required>
+                </div>
+                <button class="btn btn-brand w-100" type="submit">Log in</button>
+
+                <p class="form-note mt-4 mb-0">Do not have an account? <a class="link-brand"
+                        href="{{ url_for('signup') }}">Register here</a>.</p>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

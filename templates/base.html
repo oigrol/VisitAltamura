@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Visit Altamura{% endblock %}</title>
+
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+        rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+
+    <script src="{{url_for('static', filename='js/script.js')}}" defer></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- ensures footer is at the bottom of the page even if content is short -->
+
+    <div class="bg-effect bg-effect-1"></div>
+    <div class="bg-effect bg-effect-2"></div>
+
+    <header class="header-site">
+        <nav class="navbar">
+            <div class="container-xl">
+
+                <a class="navbar-brand" href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='images/logo_VisitAltamura.png') }}"
+                        alt="VisitAltamura logo">
+                </a>
+
+                <ul class="nav nav-links align-items-center">
+                    <li class="nav-item"><a href="{{ url_for('home') }}#tours" class="nav-link">Explore tours</a></li>
+                    <li class="nav-item"><a href="{{ url_for('home') }}#our-city" class="nav-link">Our city</a></li>
+
+                    {% if current_user.is_authenticated and current_user.role == 'guide' %}
+                    <li class="nav-item"><a href="{{ url_for('new_tour') }}" class="nav-link">Create a tour</a></li>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <li class="nav-item"><a href="{{ url_for('admin') }}" class="nav-link">Administration</a></li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-theme" id="btn-theme" type="button" aria-label="Enable dark mode"
+                            title="Enable dark mode">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+                    </li>
+
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a href="{{ p_profile_url }}" class="btn btn-link-brand">Profile</a></li>
+                    <li class="nav-item"><a href="{{ url_for('logout') }}" class="btn btn-brand">Log out</a></li>
+                    {% else %}
+                    <li class="nav-item"><a href="{{ url_for('login') }}" class="btn btn-link-brand">Log in</a></li>
+                    <li class="nav-item"><a href="{{ url_for('signup') }}" class="btn btn-brand">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+
+    <div class="flash-wrapper container-xl">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="flex-grow-1"> <!-- allows main content to grow and push footer to the bottom -->
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer-site mt-0">
+        <div class="container-xl py-4">
+            <div class="row g-4 align-items-start">
+                <section class="col-md-4">
+                    <a href="{{ url_for('home') }}">
+                        <img src="{{ url_for('static', filename='images/logo_VisitAltamura.png') }}"
+                            alt="VisitAltamura logo" class="footer-logo">
+                    </a>
+
+                    <p class="footer-text footer-description mt-3 mb-0">
+                        Authentic free walking tours through local stories and hidden corners of Altamura.
+                    </p>
+                </section>
+
+                <section class="col-md-4">
+                    <h6 class="footer-title">Navigation</h6>
+
+                    <a class="d-block footer-link mb-1" href="{{ url_for('home') }}"> Home </a>
+                    <a class="d-block footer-link mb-1" href="{{ url_for('home') }}#tours"> Explore tours </a>
+                    <a class="d-block footer-link" href="{{ url_for('home') }}#our-city"> Our city </a>
+                </section>
+
+                <section class="col-md-4">
+                    <h6 class="footer-title">Follow us</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="pills"> <i class="bi bi-instagram"></i> Instagram </span>
+                        <span class="pills"> <i class="bi bi-tiktok"></i> TikTok </span>
+                        <span class="pills"> <i class="bi bi-youtube"></i> YouTube </span>
+                    </div>
+                </section>
+            </div>
+
+            <hr class="my-4">
+
+            <small class="footer-text"> © 2026 VisitAltamura — Discover the city, one story at a time. </small>
+
+        </div>
+    </footer>
+
+    <nav class="navbar-mobile">
+        <a class="active" href="{{ url_for('home') }}" aria-label="Home" aria-current="page"><i
+                class="bi bi-house-door"></i><span>Home</span></a>
+        <a href="{{ url_for('home') }}#tours"><i class="bi bi-map"></i><span>Tours</span></a>
+        <a href="{{ url_for('home') }}#our-city"><i class="bi bi-buildings"></i><span>Our city</span></a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('profile') }}"><i class="bi bi-person-circle"></i><span>Profile</span></a>
+        {% else %}
+            <a href="{{ url_for('login') }}"><i class="bi bi-person-circle"></i><span>Login</span></a>
+        {% endif %}
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

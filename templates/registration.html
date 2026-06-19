@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Visit Altamura{% endblock %}
+
+{% block content %}
+<section class="section register-section">
+    <div class="container-xl">
+        <div class="register-card">
+            <div class="register-title">
+                <p class="section-badge">Join the community</p>
+                <h1>Create your<br><span>VisitAltamura account.</span></h1>
+                <p>Choose the role that matches your experience. Participants reserve tours. Guides create and manage
+                    them.</p>
+            </div>
+
+            <form class="form-card" method="post" action="{{ url_for('register') }}" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="first_name">First name</label>
+                        <input class="form-control" id="first_name" name="first_name" type="text" maxlength="80"
+                            required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label" for="last_name">Last name</label>
+                        <input class="form-control" id="last_name" name="last_name" type="text" maxlength="80" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="email">Email address</label>
+                        <input class="form-control" id="email" name="email" type="email" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-control" id="password" name="password" type="password" required>
+                        <!--<div class="form-text">Use at least six characters.</div>-->
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="profile_img">Upload your profile image <span
+                                class="text-muted">(optional)</span></label>
+                        <input class="form-control" type="file" id="profile_img" name="profile_img"
+                            accept=".jpg, .png, .jpeg, .webp" />
+                    </div>
+
+                    <div class="col-12">
+                        <fieldset>
+                            <legend class="form-label">Account type</legend>
+                            <div class="role-options">
+                                <label class="role-option">
+                                    <input type="radio" id="role-participant" name="role" value="participant" {% if
+                                        selected_role !='guide' %}checked{% endif %} required>
+                                    <span><i class="bi bi-backpack"></i><strong>Participant</strong><small>Explore and
+                                            reserve tours.</small></span>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" id="role-guide" name="role" value="guide" {% if
+                                        selected_role=='guide' %}checked{% endif %} required>
+                                    <span><i class="bi bi-compass"></i><strong>Guide</strong><small>Create and
+                                            manage tours.</small></span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="col-12 guide-languages {% if selected_role == 'guide' %}show{% else %}hidden{% endif %}"
+                        id="guide-languages">
+                        <fieldset>
+                            <legend class="form-label">Languages spoken</legend>
+                            <div class="checkbox-grid">
+                                {% for language in p_languages %}
+                                <label class="check-option">
+                                    <input type="checkbox" name="languages" value="{{ language }}" {% if language in
+                                        selected_languages %}checked{% endif %}>
+                                    <span>{{ language }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <button class="btn btn-brand w-100 mt-4" type="submit">Create account</button>
+
+                <p class="form-note mt-4 mb-0">Already registered? <a class="link-brand"
+                        href="{{ url_for('login') }}">Log in here</a>.</p>
+            </form>
+        </div>
+    </div>
+
+</section>
+{% endblock %}
