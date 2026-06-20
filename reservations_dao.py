@@ -2,7 +2,7 @@ from datetime import datetime
 import sqlite3
 
 def get_reservations():
-    query = "SELECT * FROM reservations"
+    query = "SELECT * FROM reservations ORDER BY tour_date, created_at"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     conn.row_factory = sqlite3.Row
@@ -120,7 +120,7 @@ def count_reservations_confirmed():
     return count
 
 def count_people_for_tour_date(p_tour_id, p_tour_date):
-    query = "SELECT SUM(num_guests) FROM reservations WHERE tour_id = ? AND tour_date = ? AND status = 'confirmed'"
+    query = "SELECT SUM(people_count) FROM reservations WHERE tour_id = ? AND tour_date = ? AND status = 'confirmed'"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
@@ -153,7 +153,7 @@ def get_reservation(p_participant_id, p_tour_id, p_tour_date):
     return db_reservation
 
 def new_reservation(p_participant_id, p_tour_id, p_tour_date, p_num_guests, p_status):
-    query = "INSERT INTO reservations (participant_id, tour_id, tour_date, num_guests, status, created_at, cancelled_at) VALUES (?,?,?,?,?,?,?)"
+    query = "INSERT INTO reservations (participant_id, tour_id, tour_date, people_count, status, created_at, cancelled_at) VALUES (?,?,?,?,?,?,?)"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
@@ -187,9 +187,10 @@ def cancel_reservation(p_reservation_id):
     conn.commit()
     cursor.close()
     conn.close()
+    return True
 
 def reservations_by_language():
-    query = "SELECT T.language, COUNT(R.id) AS num_reservations, SUM(R.people_count) AS people_count FROM reservations R, tours T WHERE R.tour_id = T.id AND R.status = 'confirmed' GROUP BY T.language ORDER BY num_reservations DESC"
+    query = "SELECT T.language, COUNT(R.id) AS num_reservations, SUM(R.people_count) AS people_count FROM reservations R, tours T WHERE R.tour_id = T.id AND R.status = 'confirmed' GROUP BY T.language ORDER BY num_reservations DESC, T.language"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()

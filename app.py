@@ -22,7 +22,7 @@ login_manager.init_app(app)
 
 @app.route('/')
 def home():
-    today = date.today().isoformat() #YYYY-MM-DD
+    today = date.today().isoformat()
 
     #prende i filtri dalla query string (stringa URL), se presenti, altrimenti li imposta a stringa vuota
     filter_date = request.args.get('date', '').strip()
@@ -64,6 +64,9 @@ def home():
 
 @app.route("/signup")
 def signup():
+    #if current_user.is_authenticated:
+        #return redirect(url_for("profile"))
+    
     role = request.args.get('role', 'participant')
     if role not in ("participant", "guide"):
         role = "participant"
@@ -71,12 +74,19 @@ def signup():
 
 @app.route("/register", methods=["POST"])
 def register():
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
-    email = request.form.get("email").lower()
+    #if current_user.is_authenticated:
+        #return redirect(url_for("profile"))
+
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    email = request.form.get("email", "").strip().lower()
     password = generate_password_hash(request.form.get("password"), method='scrypt')
-    role = request.form.get("role")        
+    role = request.form.get("role")   
     languages = request.form.getlist("languages")
+    selected_languages = []
+    for language in languages:
+        if language in LANGUAGES:
+            selected_languages.append(language)
 
     if not first_name or not last_name or not email or not password or not role:
         flash("Please complete all the required fields", "danger")
@@ -86,7 +96,7 @@ def register():
         flash("Please select a valid role", "danger")
         return redirect(url_for("signup"))
     
-    if role == "guide" and not languages:
+    if role == "guide" and not selected_languages:
         flash("Please select at least one language for guides", "danger")
         return redirect(url_for("signup"))
     
@@ -101,16 +111,9 @@ def register():
         img_path = "images/profile_imgs/" + filename_new
         profile_img.save("static/" + img_path)
     else:
-        img_path = 'images/profile_imgs/user.jpg'
+        img_path = None
 
-
-    users_dao.new_user(first_name, last_name, email, password, role, img_path)
-
-    if role == 'guide':
-        guide_id = users_dao.get_id_by_email(email)['id']
-        for language in languages:
-            if language in LANGUAGES:
-                languages_dao.new_guide_language(guide_id, language)
+    users_dao.new_user(first_name, last_name, email, password, role, img_path, selected_languages)
 
     flash("Registration successful! You can now login.", "success")
 
@@ -118,19 +121,23 @@ def register():
 
 @app.route("/login")
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("profile"))
+    
     return render_template("login.html")
 
 @app.route("/authenticate", methods=["POST"])
 def authenticate():
+    if current_user.is_authenticated:
+        return redirect(url_for("profile"))
+    
     form_user = request.form.to_dict() 
 
     db_user = users_dao.get_user_by_email(form_user["email"])
 
-    if not db_user:
-        flash("The user does not exist", "danger")
-        return redirect(url_for("login"))
-    elif not check_password_hash(db_user['password'], form_user['password']):
-        flash("The password is wrong", "danger")
+    #per evitare che il malintenzionato possa capire se l'email esiste o meno, si fa un controllo combinato: se l'utente non esiste o la password non corrisponde, si mostra lo stesso messaggio di errore
+    if not db_user or not check_password_hash(db_user['password'], form_user['password']):
+        flash("The user does not exist or the password is wrong", "danger")
         return redirect(url_for("login"))
     else:
         new = User(
@@ -146,7 +153,7 @@ def authenticate():
         login_user(new)
         flash("Welcome back! " + db_user["first_name"] + " " + db_user["last_name"] + "!", "success")
     
-    return redirect(url_for("home"))
+    return redirect(url_for("profile"))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -179,7 +186,7 @@ def profile():
     user = current_user
     return render_template("profile.html", p_user=user)'''
 
-@app.route("/tour/<int:tour_id>")
+@app.route("/tours/<int:tour_id>")
 def tour(tour_id):
     db_tour = tours_dao.get_tour_by_id(tour_id)
 
@@ -187,13 +194,24 @@ def tour(tour_id):
         flash("Tour not found", "danger")
         return redirect(url_for("home"))
     
+    db_stops = tours_dao.get_tour_stops(tour_id)
+    db_weekly_plan = tours_dao.get_tour_weekly_plan(tour_id)
     guide_id = db_tour['guide_id']
     db_guide = users_dao.get_user_by_id(guide_id)
     if not db_guide:
         flash("Guide not found", "danger")
         return redirect(url_for("home"))
     
-    guide_languages = languages_dao.get_languages_by_guide(guide_id)
-    images = tours_dao.get_tour_images(tour_id)
+    images_path = []
+    for image in tours_dao.get_tour_images(tour_id):
+        images_path.append(image['path_img'])
 
-    return render_template("tour.html", p_tour=db_tour, p_guide=db_guide, p_guide_languages=guide_languages, p_images=images)
+    '''weekly_plan = [{
+        'day_of_week': plan['day_of_week'],
+        'start_time': plan['start_time']
+        } for plan in tours_dao.get_tour_weekly_plan(tour_id)]
+
+    guide_languages = languages_dao.get_languages_by_guide(guide_id)
+    #stops = tours_dao.get_tour_stops(tour_id)'''
+
+    return render_template("tour.html", p_tour=db_tour, p_images=images_path, p_stops=db_stops, p_weekly_plan=db_weekly_plan, p_guide=db_guide, p_days=DAYS)

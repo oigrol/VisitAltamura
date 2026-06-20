@@ -1,61 +1,380 @@
 {% extends "base.html" %}
 
-{% block title %}{{ p_tour.title }} - VisitAltamura{% endblock %}
+{% block title %}
+{{ p_tour.title }} - VisitAltamura
+{% endblock %}
 
 {% block content %}
-<section class="detail-hero">
-    {% if p_images %}
-    <div id="tourDetailCarousel" class="carousel slide detail-hero-carousel" data-bs-ride="false">
-        <div class="carousel-inner">
-            {% for img in p_images %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-                <img src="{{ url_for('static', filename=img.path_img) }}" class="detail-hero-image"
-                    alt="{{ p_tour.title }} — photo {{ loop.index }}">
+
+<main class="pb-5">
+
+    <section class="pt-4 pb-3">
+        <div class="container-xl">
+            <a class="tour-back" href="{{ url_for('home') }}#tours">
+                <i class="bi bi-arrow-left"></i>
+                Back to tours
+            </a>
+
+            <div class="row g-4 align-items-end">
+
+                <div class="col-lg-9">
+                    <p class="tour-detail">
+                        <i class="bi bi-geo-alt-fill icon"></i>
+                        Free walking tour · Altamura
+                    </p>
+                    <h1 class="tour-detail-title">
+                        {{ p_tour.title }}
+                    </h1>
+                    <div class="tour-detail-info">
+                        <span>
+                            <i class="bi bi-translate"></i>
+                            {{ p_tour.language }}
+                        </span>
+                        <span>
+                            <i class="bi bi-clock"></i>
+                            {{ p_tour.duration }} minutes
+                        </span>
+                        <span>
+                            <i class="bi bi-people"></i>
+                            Maximum {{ p_tour.max_participants }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="tour-guide">
+                        {% if p_guide.profile_img %}
+                        <img class="tour-guide-avatar" src="{{ url_for('static', filename=p_guide.profile_img) }}"
+                            alt="{{ p_guide.first_name }} {{ p_guide.last_name }}">
+                        {% else %}
+                        <span class="tour-guide-avatar">
+                            {{ p_guide.first_name[0] }}
+                            {{ p_guide.last_name[0] }}
+                        </span>
+                        {% endif %}
+
+                        <div>
+                            <p>Local guide</p>
+                            <strong>
+                                {{ p_guide.first_name }}
+                                {{ p_guide.last_name }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endfor %}
         </div>
+    </section>
 
-        {% if p_images|length > 1 %}
-        <button class="carousel-control-prev" type="button" data-bs-target="#tourDetailCarousel" data-bs-slide="prev"
-            aria-label="Previous image">
+    <section class="pt-4">
+        <div class="container-xl">
+            <div id="tourCarousel" class="carousel slide tour-carousel" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-indicators">
+                    {% for path_img in p_images %}
+                    <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="{{ loop.index0 }}"
+                        class="{% if loop.first %}active{% endif %}" {% if loop.first %} aria-current="true" {% endif
+                        %}></button>
+                    {% endfor %}
+                </div>
 
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </button>
+                <div class="carousel-inner">
+                    {% for path_img in p_images %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <img src="{{ url_for('static', filename=path_img) }}" class="tour-carousel-image"
+                            alt="{{ p_tour.title }} image {{ loop.index }}">
 
-        <button class="carousel-control-next" type="button" data-bs-target="#tourDetailCarousel" data-bs-slide="next"
-            aria-label="Next image">
+                        <div class="tour-image-number">
+                            {{ loop.index }} / {{ p_images|length }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
 
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </button>
+                <button class="carousel-control-prev" type="button" data-bs-target="#tourCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">
+                        Previous image
+                    </span>
+                </button>
 
-        <div class="carousel-indicators">
-            {% for img in p_images %}
-            <button type="button" data-bs-target="#tourDetailCarousel" data-bs-slide-to="{{ loop.index0 }}"
-                class="{% if loop.first %}active{% endif %}" {% if loop.first %}aria-current="true" {% endif %}
-                aria-label="Show image {{ loop.index }}">
-            </button>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-    {% else %}
-
-    <a class="breadcrumb-link" href="{{ url_for('home') }}#tours"><i class="bi bi-arrow-left"></i> Back to tours</a>
-    <div class="row g-4 align-items-end mt-2">
-        <div class="col-lg-8">
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="detail-pill"><i class="bi bi-translate"></i>{{ p_tour.language }}</span>
-                <span class="detail-pill"><i class="bi bi-clock"></i>{{ p_tour.duration }} min</span>
-                <span class="detail-pill"><i class="bi bi-people"></i>Max {{ p_tour.max_participants }}</span>
+                <button class="carousel-control-next" type="button" data-bs-target="#tourCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">
+                        Next image
+                    </span>
+                </button>
             </div>
-            <h1>{{ p_tour.title }}</h1>
-            <p class="detail-lead">{{ p_tour.description }}</p>
         </div>
-        <div class="col-lg-4 text-lg-end">
-            <p class="detail-guide mb-1">YOUR LOCAL GUIDE</p>
-            <p class="h4 mb-0">{{ p_tour.first_name }} {{ p_tour.last_name }}</p>
+    </section>
+
+    <section class="tour-content-section">
+        <div class="container-xl">
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <section class="tour-info-card">
+                        <section class="tour-info-grid">
+                            <div class="tour-info-item">
+                                <span class="tour-info-icon">
+                                    <i class="bi bi-clock"></i>
+                                </span>
+                                <div>
+                                    <p class="tour-info-title">Duration</p>
+                                    <p class="tour-info-value">
+                                        {{ p_tour.duration }} minutes
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="tour-info-item">
+                                <span class="tour-info-icon">
+                                    <i class="bi bi-translate"></i>
+                                </span>
+                                <div>
+                                    <p class="tour-info-title">Language</p>
+                                    <p class="tour-info-value">
+                                        {{ p_tour.language }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="tour-info-item">
+                                <span class="tour-info-icon">
+                                    <i class="bi bi-people"></i>
+                                </span>
+                                <div>
+                                    <p class="tour-info-title">Group size</p>
+                                    <p class="tour-info-value">
+                                        Up to {{ p_tour.max_participants }} people
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="tour-info-item">
+                                <span class="tour-info-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+                                <div>
+                                    <p class="tour-info-title">Meeting point</p>
+                                    <p class="tour-info-value">
+                                        {{ p_tour.meeting_point }}
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </section>
+
+                    <section class="tour-section-wrapper">
+                        <div class="tour-section">
+                            <div>
+                                <p class="tour-section-label"> The experience </p>
+                                <h2> About this tour </h2>
+                                <p class="tour-description"> {{ p_tour.description }} </p>
+                            </div>
+                            <span class="tour-section-icon">
+                                <i class="bi bi-award"></i>
+                            </span>
+                        </div>
+                    </section>
+
+                    <section class="tour-section-wrapper">
+                        <div class="tour-section">
+                            <div>
+                                <p class="tour-section-label"> Weekly schedule</p>
+                                <h2>Available departures</h2>
+                            </div>
+                            <span class="tour-section-icon">
+                                <i class="bi bi-calendar3"></i>
+                            </span>
+                        </div>
+
+                        {% if p_weekly_plan %}
+                        <div class="tour-plan">
+                            {% for plan in p_weekly_plan %}
+                            <div class="tour-plan-row">
+                                <span class="tour-plan-day">
+                                    <span class="tour-plan-icon icon"></span>
+                                    {{ p_days[plan.day_of_week] }}
+                                </span>
+                                <time>
+                                    {{ plan.start_time }}
+                                </time>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% else %}
+                        <div class="tour-empty">
+                            <i class="bi bi-calendar-x"></i>
+                            <p>
+                                No departures are currently available.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="tour-section-wrapper">
+                        <div class="tour-section">
+                            <div>
+                                <p class="tour-section-label">
+                                    Walking itinerary
+                                </p>
+                                <h2>
+                                    Places you will visit
+                                </h2>
+                            </div>
+                            <span class="tour-section-icon">
+                                <i class="bi bi-signpost-split"></i>
+                            </span>
+                        </div>
+
+                        <div class="tour-stops-wrapper">
+                            {% if p_stops %}
+                            <span class="tour-stops-line"></span>
+                            <ol class="tour-stops">
+                                {% for stop in p_stops %}
+                                <li class="tour-stop">
+                                    <span class="tour-stop-number icon pulse-delay-{{ loop.index }}">
+                                        {{ loop.index }}
+                                    </span>
+                                    <div>
+                                        <small>
+                                            STOP {{ loop.index }}
+                                        </small>
+                                        <h3>
+                                            {{ stop.name }}
+                                        </h3>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ol>
+
+                            {% else %}
+                            <div class="tour-empty">
+                                <i class="bi bi-signpost"></i>
+                                <p>
+                                    The itinerary will be published soon.
+                                </p>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </section>
+
+                    <section class="tour-guide-card">
+                        {% if p_guide.profile_img %}
+                        <img class="tour-guide-avatar large" src="{{ url_for('static', filename=p_guide.profile_img) }}"
+                            alt="{{ p_guide.first_name }} {{ p_guide.last_name }}">
+                        {% else %}
+                        <span class="tour-guide-avatar large">
+                            {{ p_guide.first_name[0] }}
+                            {{ p_guide.last_name[0] }}
+                        </span>
+                        {% endif %}
+
+                        <div>
+                            <p class="tour-section-label">
+                                Your local guide
+                            </p>
+
+                            <h2>
+                                {{ p_guide.first_name }}
+                                {{ p_guide.last_name }}
+                            </h2>
+
+                            <p class="tour-guide-description">
+                                Discover Altamura with a local guide who
+                                knows its history, traditions and hidden
+                                corners.
+                            </p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-lg-4">
+                    <aside id="booking" class="tour-booking-card">
+
+                        <p class="tour-section-label">
+                            Free walking tour
+                        </p>
+
+                        <h2>
+                            Reserve your place
+                        </h2>
+
+                        <p class="tour-booking-description">
+                            Choose an available date and discover Altamura
+                            with a local guide.
+                        </p>
+
+                        <div class="tour-booking-detail">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <div>
+                                <span>MEETING POINT</span>
+                                <strong> {{ p_tour.meeting_point }} </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="tour-booking-detail">
+                            <i class="bi bi-clock-fill"></i>
+                            <div>
+                                <span>DURATION</span>
+                                <strong>{{ p_tour.duration }} minutes</strong>
+                            </div>
+
+                        </div>
+
+
+                        {% if not current_user.is_authenticated %}
+                        <a class="btn btn-brand tour-booking-button" href="{{ url_for('login') }}">
+                            Log in to book
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                        <p class="tour-booking-note">
+                            You need a participant account before making a reservation.
+                        </p>
+
+
+                        {% elif current_user.role == "guide" %}
+                        <button class="btn btn-brand tour-booking-button" type="button" disabled>
+                            Guides cannot book tours
+                        </button>
+
+                        <p class="tour-booking-note">
+                            Guide accounts can create and manage tours,
+                            but cannot make reservations.
+                        </p>
+
+                        {% else %}
+                        <!--<a class="btn btn-brand tour-booking-button"
+                            href="{{ url_for('tour', tour_id=p_tour.id) }}">
+                            Book this tour
+                            <i class="bi bi-arrow-right"></i>
+                        </a>-->
+
+                        <p class="tour-booking-note">
+                            You can reserve for yourself and add up to 3 additional participants.
+                        </p>
+                        {% endif %}
+
+
+                        <div class="tour-booking-specifications">
+                            <span>
+                                <i class="bi bi-person-check"></i>
+                                Up to 4 people per reservation
+                            </span>
+
+                            <span>
+                                <i class="bi bi-x-circle"></i>
+                                Cancellation up to 24 hours before
+                            </span>
+                        </div>
+                    </aside>
+                </div>
+            </div>
         </div>
-    </div>
-    {% endif %}
-</section>
+    </section>
+</main>
+
 {% endblock %}

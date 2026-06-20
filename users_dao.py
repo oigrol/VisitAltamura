@@ -1,15 +1,20 @@
 import sqlite3
 
-def new_user(p_first_name, p_last_name, p_email, p_password, p_role, p_profile_img):
-
-    query = "INSERT INTO users (first_name, last_name, email, password, role, profile_img) VALUES (?,?,?,?,?,?)"
+def new_user(p_first_name, p_last_name, p_email, p_password, p_role, p_profile_img, p_languages):
+    if p_profile_img is None:
+        query = "INSERT INTO users (first_name, last_name, email, password, role) VALUES (?,?,?,?,?)"
+    else:   
+        query = "INSERT INTO users (first_name, last_name, email, password, role, profile_img) VALUES (?,?,?,?,?,?)"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
 
-    cursor.execute(query, (p_first_name, p_last_name, p_email, p_password, p_role, p_profile_img))
+    if p_profile_img is None:
+        cursor.execute(query, (p_first_name, p_last_name, p_email, p_password, p_role))
+    else:   
+        cursor.execute(query, (p_first_name, p_last_name, p_email, p_password, p_role, p_profile_img))
 
-    user_id = get_id_by_email(p_email)['id']
+    user_id = cursor.lastrowid # Get the ID of the newly inserted user
     if p_role == "guide":
         for language in p_languages:
             cursor.execute("INSERT INTO guide_languages (guide_id, language) VALUES (?,?)", (user_id, language))

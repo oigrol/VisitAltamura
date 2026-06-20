@@ -71,7 +71,7 @@ Home - Visit Altamura
         <form class="filters reveal reveal-delay-2" action="{{ url_for('home') }}#tours" method="get">
             <div class="filter">
                 <label for="filterDate"><i class="bi bi-calendar3"></i><span>DATE</span></label>
-                <input class="form-control" id="filterDate" name="date" type="date" value="{{ selected_date }}"
+                <input class="form-control" id="filterDate" name="date" type="date" value="{{ p_filter_date }}"
                     min="{{ today }}">
             </div>
             <div class="filter">
@@ -79,7 +79,7 @@ Home - Visit Altamura
                 <select class="form-select" id="filterLanguage" name="language">
                     <option value="">Any language</option>
                     {% for language in p_guide_languages %}
-                    <option value="{{ language }}" {% if selected_language==language %}selected{% endif %}>{{ language
+                    <option value="{{ language }}" {% if p_filter_language==language %}selected{% endif %}>{{ language
                         }}</option>
                     {% endfor %}
                 </select>
@@ -88,11 +88,11 @@ Home - Visit Altamura
                 <label for="filterDuration"><i class="bi bi-hourglass-split"></i><span>DURATION</span></label>
                 <select class="form-select" id="filterDuration" name="duration">
                     <option value="">Any duration</option>
-                    <option value="short" {% if selected_duration=='short' %}selected{% endif %}>Short · up to 90 min
+                    <option value="short" {% if p_filter_duration=='short' %}selected{% endif %}>Short · up to 90 min
                     </option>
-                    <option value="medium" {% if selected_duration=='medium' %}selected{% endif %}>Medium · 91–150
+                    <option value="medium" {% if p_filter_duration=='medium' %}selected{% endif %}>Medium · 91–150
                         min</option>
-                    <option value="long" {% if selected_duration=='long' %}selected{% endif %}>Long · over 150 min
+                    <option value="long" {% if p_filter_duration=='long' %}selected{% endif %}>Long · over 150 min
                     </option>
                 </select>
             </div>
@@ -112,7 +112,7 @@ Home - Visit Altamura
         <section class="row g-4 reveal reveal-delay-4">
             {% for tour in p_tours %}
             <article class="col-12 col-md-6 col-xl-4">
-                <a class="tour-card" href="#">
+                <a class="tour-card" href="{{ url_for('tour', tour_id=tour.id) }}">
                     {% if tour.path_img %}
                     <img class="tour-card-img" src="{{ url_for('static', filename=tour.path_img) }}"
                         alt="{{ tour.title }} image">
@@ -155,12 +155,6 @@ Home - Visit Altamura
                                 Max {{ tour.max_participants }}
                             </span>
 
-                            {% if tour.day_of_week %}
-                            <span class="tour-card-info">
-                                <i class="bi bi-calendar3"></i>
-                                {{ tour.day_of_week | replace('-', '/') }}
-                            </span>
-                            {% endif %}
                         </div>
                     </div>
                 </a>
