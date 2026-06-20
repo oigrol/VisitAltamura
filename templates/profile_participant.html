@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile - Visit Altamura
+{% endblock %}
+
+{% block content %}
+<section class="section profile-section">
+    <div class="container-xl">
+
+        <!-- Profile header -->
+        <div class="profile-header reveal reveal-delay-1">
+            <div class="profile-avatar">
+                <i class="bi bi-backpack"></i>
+            </div>
+            <div class="profile-info">
+                <p class="section-badge">Participant</p>
+                <h1 class="profile-name">{{ p_participant.first_name }} {{ p_participant.last_name }}</h1>
+                <p class="profile-email"><i class="bi bi-envelope"></i> {{ p_participant.email }}</p>
+            </div>
+            <a href="{{ url_for('home') }}#tours" class="btn btn-brand ms-auto">
+                <i class="bi bi-map me-1"></i>Explore tours
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

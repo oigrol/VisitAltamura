@@ -45,7 +45,7 @@ Home - Visit Altamura
 </section>
 
 <section class="stats-section">
-    <div class="row g-0 m-0">
+    <div class="row g-0 m-0 reveal reveal-delay-2">
         <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_tours | default(0) }}</strong>
             <span>CURATED TOURS</span>
         </article>
@@ -61,14 +61,14 @@ Home - Visit Altamura
 
 <section class="section" id="tours">
     <div class="container-xl">
-        <div class="section-title reveal reveal-delay-1">
+        <div class="section-title reveal reveal-delay-3">
             <div>
                 <p class="section-badge">Follow your feelings</p>
                 <h2>A walk for every kind<br>of <span>curiosity.</span></h2>
             </div>
         </div>
 
-        <form class="filters reveal reveal-delay-2" action="{{ url_for('home') }}#tours" method="get">
+        <form class="filters reveal reveal-delay-4" action="{{ url_for('home') }}#tours" method="get">
             <div class="filter">
                 <label for="filterDate"><i class="bi bi-calendar3"></i><span>DATE</span></label>
                 <input class="form-control" id="filterDate" name="date" type="date" value="{{ p_filter_date }}"
@@ -104,25 +104,17 @@ Home - Visit Altamura
             </div>
         </form>
 
-        <div class="tour-count reveal reveal-delay-3">
+        <div class="tour-count reveal reveal-delay-5">
             <span>{{ p_tours|length }}</span> EXPERIENCE{% if p_tours|length != 1 %}S{% endif %} READY TO EXPLORE
         </div>
 
         {% if p_tours %}
-        <section class="row g-4 reveal reveal-delay-4">
+        <section class="row g-4 reveal reveal-delay-6">
             {% for tour in p_tours %}
             <article class="col-12 col-md-6 col-xl-4">
                 <a class="tour-card" href="{{ url_for('tour', tour_id=tour.id) }}">
-                    {% if tour.path_img %}
                     <img class="tour-card-img" src="{{ url_for('static', filename=tour.path_img) }}"
                         alt="{{ tour.title }} image">
-                    <!--                    <img class="tour-card-img" src="{{ url_for('static', filename='/images/tours/' + tour.path_img) }}"
-                        alt="{{ tour.title }} image">-->
-                    {% else %}
-                    <div class="tour-card-placeholder">
-                        <i class="bi bi-map"></i>
-                    </div>
-                    {% endif %}
 
                     <div class="tour-card-overlay">
                     </div>
@@ -154,7 +146,6 @@ Home - Visit Altamura
 
                                 Max {{ tour.max_participants }}
                             </span>
-
                         </div>
                     </div>
                 </a>
@@ -162,8 +153,8 @@ Home - Visit Altamura
             {% endfor %}
         </section>
         {% else %}
-        <section class="no-found reveal reveal-delay-4">
-            <i class="bi bi-search no-found-icon"></i>
+        <section class="no-found reveal reveal-delay-6">
+            <i class="bi bi-search no-found-icon icon"></i>
             <h3 class="fs-2 mb-2"> No tours found </h3>
             <p class="mb-3"> Try adjusting the date, duration or language filter. </p>
             <a class="btn btn-brand" href="{{ url_for('home') }}#tours"> Show all tours </a>
@@ -199,11 +190,11 @@ Home - Visit Altamura
             <div class="col-lg-7 reveal reveal-delay-2">
                 <div class="city-img-grid">
                     <img src="{{ url_for('static', filename='images/tours/cathedral.webp') }}"
-                        alt="Cattedrale di Altamura" class="city-img city-img-main">
+                        alt="Cattedrale di Altamura" class="city-img city-img-main reveal reveal-delay-3">
                     <img src="{{ url_for('static', filename='images/tours/claustri.webp') }}"
-                        alt="Chiostri del centro storico" class="city-img city-img-sm-1">
+                        alt="Chiostri del centro storico" class="city-img city-img-sm-1 reveal reveal-delay-4">
                     <img src="{{ url_for('static', filename='images/tours/pane-altamura.webp') }}"
-                        alt="Pane DOP di Altamura" class="city-img city-img-sm-2">
+                        alt="Pane DOP di Altamura" class="city-img city-img-sm-2 reveal reveal-delay-5">
                 </div>
             </div>
         </div>
@@ -212,35 +203,35 @@ Home - Visit Altamura
 
 <section class="section" id="how-it-works">
     <div class="container">
-        <div class="justify-content-center text-center mb-5">
+        <div class="justify-content-center text-center mb-5 reveal reveal-delay-1">
             <div class="section-badge mx-auto mb-3 reveal">The concept</div>
             <h2 class="reveal">Simple. Free. Memorable.</h2>
             <div class="section-divider mx-auto mt-3 reveal"></div>
         </div>
 
         <div class="row g-4">
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-3 reveal reveal-delay-2">
                 <article class="step-card reveal">
                     <span class="step-card-icon"><i class="bi bi-search icon"></i></span>
                     <h4>Discover</h4>
                     <p>Browse recurring tours led by passionate local guides.</p>
                 </article>
             </div>
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-3 reveal reveal-delay-3">
                 <article class="step-card reveal">
                     <span class="step-card-icon"><i class="bi bi-calendar-check icon"></i></span>
                     <h4>Reserve</h4>
                     <p>Choose an available date and secure your place for free.</p>
                 </article>
             </div>
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-3 reveal reveal-delay-4">
                 <article class="step-card reveal">
                     <span class="step-card-icon"><i class="bi bi-person-walking icon"></i></span>
                     <h4>Walk</h4>
                     <p>Meet your guide and explore the stories of Altamura.</p>
                 </article>
             </div>
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-3 reveal reveal-delay-5">
                 <article class="step-card reveal">
                     <span class="step-card-icon"><i class="bi bi-heart icon"></i></span>
                     <h4>Tip</h4>
@@ -249,7 +240,7 @@ Home - Visit Altamura
             </div>
         </div>
 
-        <div class="text-center mt-5 pt-2 reveal">
+        <div class="text-center mt-5 pt-2 reveal reveal-delay-6">
             <a href="{{ url_for('signup', role='participant') }}" class="btn btn-brand btn-lg">
                 Start Exploring — It's Free
             </a>
@@ -262,7 +253,7 @@ Home - Visit Altamura
 </section>
 
 <section class="section-cta-wrapper">
-    <div class="container-xl section-cta reveal">
+    <div class="container-xl section-cta reveal reveal-delay-1">
         <div>
             <p class="section-badge">Share your point of view</p>
             <h2>Know a story worth walking?</h2>
