@@ -204,3 +204,57 @@ def reservations_by_language():
     conn.close()
 
     return db_data
+
+#
+def get_reservations_for_participant(p_participant_id):
+    query = """
+        SELECT
+            R.*,
+            T.title AS tour_title,
+            T.meeting_point,
+            T.duration,
+            T.language,
+            T.max_participants,
+            U.first_name AS guide_first_name,
+            U.last_name AS guide_last_name,
+            WP.start_time,
+            (
+                SELECT TI.path_img
+                FROM tour_images TI
+                WHERE TI.tour_id = T.id
+                ORDER BY TI.position
+                LIMIT 1
+            ) AS path_img
+        FROM reservations R
+        JOIN tours T
+            ON T.id = R.tour_id
+        JOIN users U
+            ON U.id = T.guide_id
+        LEFT JOIN tour_weekly_plan WP
+            ON WP.tour_id = R.tour_id
+            AND WP.day_of_week = (
+                (
+                    CAST(strftime('%w', R.tour_date) AS INTEGER)
+                    + 6
+                ) % 7
+            )
+        WHERE R.participant_id = ?
+        ORDER BY R.tour_date, WP.start_time
+    """
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute(
+        query,
+        (p_participant_id,),
+    )
+
+    db_reservations = cursor.fetchall()
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return db_reservations

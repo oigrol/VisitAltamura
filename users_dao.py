@@ -190,3 +190,35 @@ def count_participants():
     conn.close()
 
     return count
+
+def count_tours_by_guide(p_guide_id):
+    query = "SELECT COUNT(*) FROM tours WHERE guide_id = ?"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_guide_id,))
+
+    count = cursor.fetchone()[0]
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return count
+
+def count_stops_by_guide(p_guide_id):
+    query = "SELECT COUNT(*) FROM tour_stops WHERE tour_id IN (SELECT id FROM tours WHERE guide_id = ?)"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_guide_id,))
+
+    count = cursor.fetchone()[0]
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return count

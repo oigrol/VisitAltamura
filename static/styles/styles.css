@@ -1014,11 +1014,15 @@ h2 span {
     width: 3.4rem;
     height: 3.4rem;
     border-radius: 50%;
-    background: var(--brand);
-    color: var(--text-white);
+    background: var(--brand-soft);
+    color: var(--brand-dark);
     font-family: var(--serif);
     font-weight: 700;
+    object-fit: cover;
+    flex-shrink: 0;
     text-transform: uppercase;
+    overflow: hidden;
+    box-shadow: var(--shadow-small);
 }
 
 .tour-guide-avatar.large {
@@ -1434,6 +1438,321 @@ h2 span {
     color: var(--brand);
 }
 
+/* PROFILE PAGE */
+
+.profile-section {
+    min-height: 600px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow-small);
+    padding: 2rem;
+}
+
+.profile-avatar {
+    background: var(--brand-soft);
+    border-radius: 50%;
+    color: var(--brand-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    font-family: var(--serif);
+    width: 102px;
+    height: 102px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    overflow: hidden;
+    object-fit: cover;
+    box-shadow: var(--shadow-small);
+}
+
+.profile-btn {
+    margin-left: auto;
+}
+
+.profile-info {
+    flex-grow: 1;
+    min-width: 220px;
+}
+
+.profile-name {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.profile-email {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.stats-profile-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    height: 100%;
+    padding: 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--bg-soft);
+    box-shadow: var(--shadow-small);
+}
+
+.stats-profile-card i {
+    flex-shrink: 0;
+    padding-top: 0.15rem;
+    color: var(--brand);
+    font-size: 1.45rem;
+}
+
+.stats-profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.stats-profile-content span {
+    color: var(--text-soft);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.stats-profile-content strong {
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.profile-tour-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow-small);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.profile-tour-card:hover {
+    box-shadow: 0 16px 36px rgba(38, 51, 47, 0.13);
+    transform: translateY(-3px);
+}
+
+.profile-tour-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-tour-img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: var(--brand-soft);
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.profile-tour-content {
+    padding: 1.2rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-tour-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+}
+
+.profile-tour-info {
+    color: var(--text-soft);
+    font-size: 0.84rem;
+    margin-bottom: 0;
+}
+
+.profile-divisor {
+    margin: 4rem 0 0;
+    border-color: var(--line);
+}
+
+
+.reservation-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.reservation-card-heading .profile-tour-title {
+    min-width: 0;
+    margin: 0;
+}
+
+/* Reservation status */
+.reservation-status {
+    flex-shrink: 0;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.reservation-status-confirmed {
+    background: rgba(46, 125, 90, 0.12);
+    color: #246b4c;
+}
+
+.reservation-status-completed {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+
+.reservation-status-cancelled {
+    background: rgba(176, 52, 52, 0.1);
+    color: #9c3131;
+}
+
+/* Reservation pills */
+.reservation-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Reservation information */
+.reservation-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.reservation-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.9rem;
+    border-radius: 12px;
+    background: var(--bg-deep);
+}
+
+.reservation-detail>i {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    color: var(--brand);
+}
+
+.reservation-detail span,
+.reservation-detail strong {
+    display: block;
+}
+
+.reservation-detail span {
+    margin-bottom: 0.15rem;
+    color: var(--text-soft);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.reservation-detail strong {
+    color: var(--text);
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+/* Additional guests */
+.reservation-guests {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.reservation-guests>p {
+    margin-bottom: 0.65rem;
+    color: var(--text-soft);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.reservation-guests ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reservation-guests li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+/* Card actions */
+.reservation-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.reservation-actions form {
+    margin: 0;
+}
+
+.reservation-locked {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.profile-tour-card-history {
+    opacity: 0.92;
+}
 
 
 @media (max-width: 768px) {
@@ -1567,4 +1886,15 @@ h2 span {
     .tour-booking-card h2 {
         font-size: 1.8rem;
     }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-btn {
+        margin-left: 0;
+    }
+
 }

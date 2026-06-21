@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 import time
 
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -59,6 +59,39 @@ def home():
                            p_filter_language=filter_language, 
                            p_filter_duration=filter_duration, 
                            today=today)
+
+
+# --- Tour details ---
+
+@app.route("/tours/<int:tour_id>")
+def tour(tour_id):
+    db_tour = tours_dao.get_tour_by_id(tour_id)
+    if not db_tour:
+        flash("Tour not found", "danger")
+        return redirect(url_for("home"))
+    
+    db_stops = tours_dao.get_tour_stops(tour_id)
+    db_weekly_plan = tours_dao.get_tour_weekly_plan(tour_id)
+    guide_id = db_tour['guide_id']
+    db_guide = users_dao.get_user_by_id(guide_id)
+    '''if not db_guide:
+        flash("Guide not found", "danger")
+        return redirect(url_for("home"))'''
+    
+    images_path = []
+    for image in tours_dao.get_tour_images(tour_id):
+        images_path.append(image['path_img'])
+
+    '''weekly_plan = [{
+        'day_of_week': plan['day_of_week'],
+        'start_time': plan['start_time']
+        } for plan in tours_dao.get_tour_weekly_plan(tour_id)]
+
+    guide_languages = languages_dao.get_languages_by_guide(guide_id)
+    #stops = tours_dao.get_tour_stops(tour_id)'''
+
+    return render_template("tour.html", p_tour=db_tour, p_images=images_path, p_stops=db_stops, p_weekly_plan=db_weekly_plan, p_guide=db_guide, p_days=DAYS)
+
 
 # --- Authentication ---
 
@@ -121,15 +154,15 @@ def register():
 
 @app.route("/login")
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("profile"))
+    #if current_user.is_authenticated:
+        #return redirect(url_for("profile"))
     
     return render_template("login.html")
 
 @app.route("/authenticate", methods=["POST"])
 def authenticate():
-    if current_user.is_authenticated:
-        return redirect(url_for("profile"))
+    #if current_user.is_authenticated:
+        #return redirect(url_for("profile"))
     
     form_user = request.form.to_dict() 
 
@@ -153,7 +186,7 @@ def authenticate():
         login_user(new)
         flash("Welcome back! " + db_user["first_name"] + " " + db_user["last_name"] + "!", "success")
     
-    return redirect(url_for("profile"))
+    return redirect(url_for("home"))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -180,38 +213,101 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for("home"))
 
-'''@app.route("/profile")
+@app.route("/profile")
 @login_required
 def profile():
     user = current_user
-    return render_template("profile.html", p_user=user)'''
+    if user.role == 'guide':
+        return redirect(url_for("profile_guide"))
+    elif user.role == 'participant':
+        return redirect(url_for("profile_participant"))
+    return redirect(url_for("home"))
 
-@app.route("/tours/<int:tour_id>")
-def tour(tour_id):
-    db_tour = tours_dao.get_tour_by_id(tour_id)
+@app.route("/profile/guide")
+@login_required
+def profile_guide():
+    if current_user.role != 'guide':
+        flash("Access denied: this page is only for guides", "danger")
+        return redirect(url_for("home"))
 
-    if not db_tour:
-        flash("Tour not found", "danger")
+    user = current_user
+
+    guide_languages = languages_dao.get_languages_by_guide(user.id)
+    
+    db_tours = tours_dao.get_tours_by_guide(user.id)
+    tours_data = []
+    for tour in db_tours:
+        has_reservations = tours_dao.has_reservations(tour['id'])
+        tours_data.append({
+            'tour': tour, 
+            'has_reservations': has_reservations
+            })
+        #if tours have no reservations, the guide can delete them, otherwise not
+        
+    totals = {
+        "tours": users_dao.count_tours_by_guide(user.id),
+        "stops": users_dao.count_stops_by_guide(user.id),
+        "reports_due": 0, #reports_dao.count_reports_due_by_guide(user.id)
+        }
+    
+    return render_template("profile_guide.html", p_guide=user, p_guide_languages=guide_languages, p_totals=totals, p_tours_data=tours_data)
+
+@app.route("/profile/participant")
+@login_required
+def profile_participant():
+    if current_user.role != 'participant':
+        flash("Access denied: this page is only for participants", "danger")
         return redirect(url_for("home"))
     
-    db_stops = tours_dao.get_tour_stops(tour_id)
-    db_weekly_plan = tours_dao.get_tour_weekly_plan(tour_id)
-    guide_id = db_tour['guide_id']
-    db_guide = users_dao.get_user_by_id(guide_id)
-    if not db_guide:
-        flash("Guide not found", "danger")
-        return redirect(url_for("home"))
+    user = current_user    
+    current_datetime = datetime.now() 
+
+    db_reservations = reservations_dao.get_reservations_for_participant(user.id)
+
+    number_people = 0
+    upcoming_reservations = []
+    number_upcoming_reservations = 0
+    history_reservations = []
+    number_completed_reservations = 0
+    for reservation in db_reservations: 
+        guests = reservations_dao.get_guests_by_reservation(reservation["id"])
+        #un tour può avere al massimo un orario di partenza per ogni giorno della settimana.
+        tour_weekday = date.fromisoformat(reservation["tour_date"]).weekday()
+        weekly_plan = tours_dao.get_tour_weekly_plan(reservation["tour_id"])
+        start_time = None
+        for plan in weekly_plan:
+            if plan["day_of_week"] == tour_weekday:
+                start_time = plan["start_time"]
+                break
+            
+        #24h before the tour start time, the participant can cancel the reservation
+        cancellable = False
+        if reservation["status"] == "confirmed" and start_time is not None:
+            tour_datetime = datetime.fromisoformat(reservation["tour_date"] + " " + start_time)
+            cancellable = (tour_datetime - current_datetime >= timedelta(hours=24))
+            #timedelta is the difference between two datetime objects, and we check if it's greater than or equal to 24 hours
+            if tour_datetime >= current_datetime:
+                upcoming_reservations.append({
+                    "reservation": reservation,
+                    "guests": guests,
+                    "start_time": start_time,
+                    "cancellable": cancellable
+                    })
+                number_upcoming_reservations += 1
+                number_people += reservation["people_count"]
+        elif tour_datetime < current_datetime:
+            history_reservations.append({
+            "reservation": reservation,
+            "guests": guests,
+            "start_time": start_time,
+            "cancellable": cancellable
+            })
+            if ( reservation["status"] == "confirmed" ):
+                number_completed_reservations += 1
+
+    totals = {
+        "upcoming": number_upcoming_reservations,
+        "people": number_people, 
+        "completed": number_completed_reservations }
     
-    images_path = []
-    for image in tours_dao.get_tour_images(tour_id):
-        images_path.append(image['path_img'])
-
-    '''weekly_plan = [{
-        'day_of_week': plan['day_of_week'],
-        'start_time': plan['start_time']
-        } for plan in tours_dao.get_tour_weekly_plan(tour_id)]
-
-    guide_languages = languages_dao.get_languages_by_guide(guide_id)
-    #stops = tours_dao.get_tour_stops(tour_id)'''
-
-    return render_template("tour.html", p_tour=db_tour, p_images=images_path, p_stops=db_stops, p_weekly_plan=db_weekly_plan, p_guide=db_guide, p_days=DAYS)
+    return render_template("profile_participant.html", p_participant=user, p_totals=totals, p_upcoming_reservations=upcoming_reservations, p_reservation_history=history_reservations)
