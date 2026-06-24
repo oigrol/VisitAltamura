@@ -46,16 +46,16 @@ Home - Visit Altamura
 
 <section class="stats-section">
     <div class="row g-0 m-0 reveal reveal-delay-2">
-        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_tours | default(0) }}</strong>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_stats.count_tours | default(0) }}</strong>
             <span>CURATED TOURS</span>
         </article>
-        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_guides | default(0) }}</strong>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_stats.count_guides | default(0) }}</strong>
             <span>LOCAL GUIDES</span>
         </article>
-        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_guide_languages | default(0)
-                }}</strong> <span>LANGUAGES OFFERED</span> </article>
-        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_count_reservations | default(0)
-                }}</strong> <span>ACTIVE RESERVATIONS</span> </article>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_stats.count_guide_languages | default(0) }}</strong>
+            <span>LANGUAGES OFFERED</span> </article>
+        <article class="col-lg-3 col-md-6 stats"> <strong class="counter">{{ p_stats.count_reservations | default(0) }}</strong>
+            <span>ACTIVE RESERVATIONS</span> </article>
     </div>
 </section>
 
@@ -72,7 +72,7 @@ Home - Visit Altamura
             <div class="filter">
                 <label for="filterDate"><i class="bi bi-calendar3"></i><span>DATE</span></label>
                 <input class="form-control" id="filterDate" name="date" type="date" value="{{ p_filter_date }}"
-                    min="{{ today }}">
+                    min="{{ p_today }}">
             </div>
             <div class="filter">
                 <label for="filterLanguage"><i class="bi bi-translate"></i><span>LANGUAGE</span></label>

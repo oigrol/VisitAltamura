@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Tour — Visit Altamura
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container-xl">
+
+        <div class="form-page">
+
+            <div class="form-page-title">
+                <p class="section-badge">Edit tour</p>
+
+                <h1>
+                    Update your<br>
+                    <span>tour details.</span>
+                </h1>
+
+                {% if p_has_reservations %}
+                <p>
+                    <i class="bi bi-lock me-1"></i>
+                    This tour has active reservations. You can only update
+                    its title and description.
+                </p>
+                {% else %}
+                <p>
+                    Update the information, weekly schedule, itinerary
+                    and promotional photos of your tour.
+                </p>
+                {% endif %}
+            </div>
+
+            <form class="form-card tour-form" method="post" action="{{ url_for('update_tour', tour_id=p_tour.id) }}"
+                enctype="multipart/form-data">
+
+                <fieldset class="tour-form-section is-first">
+                    <legend class="tour-form-legend">Basic info</legend>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="title">
+                            Tour title
+                            <span class="text-muted">(required)</span>
+                        </label>
+
+                        <input class="form-control" id="title" name="title" type="text" maxlength="120"
+                            value="{{ p_tour.title }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="description">
+                            Description
+                            <span class="text-muted">(required)</span>
+                        </label>
+
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                            required>{{ p_tour.description }}</textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
+                    <legend class="tour-form-legend">
+                        Tour details
+
+                        {% if p_has_reservations %}
+                        <span class="form-note text-muted ms-2">
+                            <i class="bi bi-lock"></i>
+                            Locked
+                        </span>
+                        {% endif %}
+                    </legend>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="language">
+                                Language
+                            </label>
+
+                            <select class="form-select" id="language" name="language" required>
+
+                                <option value="">Select language...</option>
+
+                                {% for language in p_languages %}
+                                <option value="{{ language }}" {% if p_tour.language==language %}selected{% endif %}>
+                                    {{ language }}
+                                </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="duration">
+                                Duration (minutes)
+                            </label>
+
+                            <input class="form-control" id="duration" name="duration" type="number" min="1"
+                                value="{{ p_tour.duration }}" required>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label" for="meeting_point">
+                                Meeting point
+                            </label>
+
+                            <input class="form-control" id="meeting_point" name="meeting_point" type="text"
+                                maxlength="200" value="{{ p_tour.meeting_point }}" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="max_participants">
+                                Max participants
+                            </label>
+
+                            <input class="form-control" id="max_participants" name="max_participants" type="number"
+                                min="1" value="{{ p_tour.max_participants }}" required>
+                        </div>
+
+                    </div>
+                </fieldset>
+
+                <!-- WEEKLY SCHEDULE -->
+                <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
+
+                    <legend class="tour-form-legend">
+                        Weekly schedule
+
+                        {% if p_has_reservations %}
+                        <span class="form-note text-muted ms-2">
+                            <i class="bi bi-lock"></i>
+                            Locked
+                        </span>
+                        {% endif %}
+                    </legend>
+
+                    <p class="form-note text-muted mb-3">
+                        Select the days this tour runs and set the start time for each.
+                    </p>
+
+                    {% set plan_map = {} %}
+
+                    {% for entry in p_weekly_plan %}
+                    {% set unused = plan_map.update({
+                    entry.day_of_week: entry.start_time
+                    }) %}
+                    {% endfor %}
+
+                    {% for i in range(7) %}
+                    {% set checked = i in plan_map %}
+
+                    <div class="day-schedule-row">
+
+                        <div class="form-check day-check">
+                            <input class="form-check-input" type="checkbox" name="day_{{ i }}" id="day_{{ i }}"
+                                value="1" {% if checked %}checked{% endif %} onchange="toggleDayTime({{ i }})">
+
+                            <label class="form-check-label fw-bold" for="day_{{ i }}">
+                                {{ p_days[i] }}
+                            </label>
+                        </div>
+
+                        <input class="form-control day-time-input" type="time" name="start_time_{{ i }}"
+                            id="start_time_{{ i }}" value="{{ plan_map[i] if checked else '' }}" {% if checked
+                            %}required{% endif %}>
+
+                    </div>
+                    {% endfor %}
+                </fieldset>
+
+                <!-- ITINERARY STOPS -->
+                <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
+
+                    <legend class="tour-form-legend">
+                        Itinerary stops
+                        <span class="text-muted">(at least 4)</span>
+
+                        {% if p_has_reservations %}
+                        <span class="form-note text-muted ms-2">
+                            <i class="bi bi-lock"></i>
+                            Locked
+                        </span>
+                        {% endif %}
+                    </legend>
+
+                    <div id="stops-container" class="d-flex flex-column gap-2">
+
+                        {% for stop in p_stops %}
+                        <div class="stop-row d-flex gap-2">
+
+                            <span class="stop-number">
+                                {{ loop.index }}
+                            </span>
+
+                            <input class="form-control" type="text" name="stops" value="{{ stop.name }}"
+                                placeholder="Stop name" required>
+
+                            {% if loop.index > 4 %}
+                            <button class="btn btn-sm btn-danger-soft" type="button" onclick="removeStop(this)"
+                                aria-label="Remove stop">
+
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                            {% endif %}
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <button class="btn btn-sm btn-outline-secondary mt-3" type="button" onclick="addStop()">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add stop
+                    </button>
+                </fieldset>
+
+                <!-- PHOTOS -->
+                <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
+
+                    <legend class="tour-form-legend">
+                        Promotional photos
+                        <span class="text-muted">(5 required)</span>
+
+                        {% if p_has_reservations %}
+                        <span class="form-note text-muted ms-2">
+                            <i class="bi bi-lock"></i>
+                            Locked
+                        </span>
+                        {% endif %}
+                    </legend>
+
+                    {% if p_images %}
+                    <div class="existing-photos-grid mb-3">
+
+                        {% for image in p_images %}
+                        <div class="existing-photo">
+
+                            <img src="{{ url_for('static', filename=image.path_img) }}"
+                                alt="Tour photo {{ loop.index }}">
+
+                            <span class="existing-photo-label">
+                                Photo {{ loop.index }}
+                            </span>
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                    {% if not p_has_reservations %}
+                    <p class="form-note text-muted small mb-3">
+                        Upload new images below to replace the existing ones.
+                        Leave the fields empty to keep the current photos.
+                    </p>
+                    {% endif %}
+                    {% endif %}
+
+                    <div class="row g-3">
+
+                        {% for image in p_images %}
+                        <div class="col-md-6 col-lg-4">
+
+                            <label class="form-label" for="image_{{ image.position }}">
+                                Photo {{ image.position }}
+                            </label>
+
+                            <input class="form-control" type="file" id="image_{{ image.position }}"
+                                name="image_{{ image.position }}" accept=".jpg,.jpeg,.png,.webp">
+
+                            <div class="form-text"> Leave this field empty to keep the current photo. </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </fieldset>
+
+                <!-- ACTIONS -->
+                <div class="d-flex gap-3 mt-4">
+
+                    <button class="btn btn-brand" type="submit">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Save changes
+                    </button>
+
+                    <a class="btn btn-outline-secondary" href="{{ url_for('profile_guide') }}">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

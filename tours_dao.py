@@ -3,8 +3,8 @@ from datetime import date, datetime
 
 def new_tour(p_title, p_description, p_guide_id, p_duration, p_language, p_meeting_point, p_max_participants, p_weekly_plan, p_stops, p_images):
     
-    query_tour = "INSERT INTO tours (title, description, guide_id, duration, language, meeting_point, max_participants, created_at) VALUES (?,?,?,?,?,?,?,?, ?)"
-    query_weekly_plan = "INSERT INTO weekly_plans (tour_id, day_of_week, start_time) VALUES (?,?,?)"
+    query_tour = "INSERT INTO tours (title, description, guide_id, duration, language, meeting_point, max_participants, created_at) VALUES (?,?,?,?,?,?,?,?)"
+    query_weekly_plan = "INSERT INTO tour_weekly_plan (tour_id, day_of_week, start_time) VALUES (?,?,?)"
     query_stop = "INSERT INTO tour_stops (tour_id, position, name) VALUES (?,?,?)"
     query_image = "INSERT INTO tour_images (tour_id, path_img, position) VALUES (?,?,?)"
     
@@ -13,16 +13,16 @@ def new_tour(p_title, p_description, p_guide_id, p_duration, p_language, p_meeti
 
     cursor.execute(query_tour, (p_title, p_description, p_guide_id, p_duration, p_language, p_meeting_point, p_max_participants, datetime.now()))
 
-    tour_id = get_id_by_title_and_guide(p_title, p_guide_id)
+    tour_id = cursor.lastrowid
      
-    for (day_of_week, start_time) in p_weekly_plan:
-        cursor.execute(query_weekly_plan, (tour_id, day_of_week, start_time))
+    for plan in p_weekly_plan:
+        cursor.execute(query_weekly_plan, (tour_id, plan['day_of_week'], plan['start_time']))
     
-    for (position, name) in p_stops:
-        cursor.execute(query_stop, (tour_id, position, name))
+    for stop in p_stops:
+        cursor.execute(query_stop, (tour_id, stop['position'], stop['name']))
     
-    for (path_img, position) in p_images:
-        cursor.execute(query_image, (tour_id, path_img, position))
+    for image in p_images:
+        cursor.execute(query_image, (tour_id, image['path_img'], image['position']))
     
     conn.commit()
     cursor.close()
@@ -71,19 +71,6 @@ def get_tours_by_filters(p_date, p_language, p_duration):
     conn.close()
 
     return db_tours
-
-
-def get_id_by_title_and_guide(p_title, p_guide_id):
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    cursor = conn.cursor()
-
-    tour_id = cursor.execute("SELECT id FROM tours WHERE title = ? AND guide_id = ? ORDER BY created_at DESC LIMIT 1", (p_title, p_guide_id)).fetchone()[0]
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return tour_id
 
 def get_tour_by_id(p_tour_id):
     query = "SELECT T.*, U.first_name, U.last_name, U.email AS guide_email, (SELECT TI.path_img FROM tour_images TI WHERE TI.tour_id = T.id ORDER BY TI.position LIMIT 1) AS path_img FROM tours T, users U WHERE T.guide_id = U.id AND T.id = ?"
@@ -170,8 +157,8 @@ def get_tours_by_guide(p_guide_id):
     return db_tours
 
 def has_reservations(p_tour_id):
-    # This function checks if there are any confirmed reservations for the given tour.
-    query = "SELECT COUNT(*) FROM reservations WHERE tour_id = ? AND status = 'confirmed'"
+    # Check if a tour has any reservations
+    query = "SELECT COUNT(*) FROM reservations WHERE tour_id = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
@@ -189,19 +176,35 @@ def has_reservations(p_tour_id):
     
     return False
 
-def update_tour(p_tour_id, p_title, p_description, p_duration, p_language, p_meeting_point, p_max_participants):
+def update_tour(p_tour_id, p_title, p_description, p_duration, p_language, p_meeting_point, p_max_participants, p_weekly_plan, p_stops, p_images):
     query = "UPDATE tours SET title = ?, description = ?, duration = ?, language = ?, meeting_point = ?, max_participants = ? WHERE id = ?"
+    query_weekly_plan_delete = "DELETE FROM tour_weekly_plan WHERE tour_id = ?"
+    query_weekly_plan_insert = "INSERT INTO tour_weekly_plan (tour_id, day_of_week, start_time) VALUES (?, ?, ?)"
+    query_stop_delete = "DELETE FROM tour_stops WHERE tour_id = ?"
+    query_stop_insert = "INSERT INTO tour_stops (tour_id, position, name) VALUES (?, ?, ?)"
+    query_image = "UPDATE tour_images SET path_img = ? WHERE tour_id = ? AND position = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
 
     cursor.execute(query, (p_title, p_description, p_duration, p_language, p_meeting_point, p_max_participants, p_tour_id))
+    
+    cursor.execute(query_weekly_plan_delete, (p_tour_id,))
+    for plan in p_weekly_plan:
+        cursor.execute(query_weekly_plan_insert, (p_tour_id, plan['day_of_week'], plan['start_time']))
+    
+    cursor.execute(query_stop_delete, (p_tour_id,))
+    for stop in p_stops:
+        cursor.execute(query_stop_insert, (p_tour_id, stop['position'], stop['name']))
+    
+    for image in p_images:
+        cursor.execute(query_image, (image['path_img'], p_tour_id, image['position']))
 
     conn.commit()
     cursor.close()
     conn.close()
 
-def update_title_description_tour(p_tour_id, p_title, p_description):
+def update_tour_with_reservations(p_tour_id, p_title, p_description):
     query = "UPDATE tours SET title = ?, description = ? WHERE id = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
@@ -221,11 +224,19 @@ def delete_tour(p_tour_id):
         return False
     
     query = "DELETE FROM tours WHERE id = ?"
-    #dovrei eliminare anche le tabelle tour_weekly_plan, stops e tour_images, ma grazie al vincolo di foreign key con ON DELETE CASCADE, vengono eliminate automaticamente quando elimino la riga della tabella tours.
+    query_weekly_plan = "DELETE FROM tour_weekly_plan WHERE tour_id = ?"
+    query_stops = "DELETE FROM tour_stops WHERE tour_id = ?"
+    query_images = "DELETE FROM tour_images WHERE tour_id = ?"
+    #query_reports = "DELETE FROM tour_final_reports WHERE tour_id = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
 
+    cursor.execute(query_images, (p_tour_id,))
+    cursor.execute(query_stops, (p_tour_id,))
+    cursor.execute(query_weekly_plan, (p_tour_id,))
+    #eventuali reports associati al tour devono essere eliminati prima di eliminare il tour stesso
+    #cursor.execute(query_reports, (p_tour_id,))
     cursor.execute(query, (p_tour_id,))
 
     conn.commit()

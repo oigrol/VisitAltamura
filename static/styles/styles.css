@@ -1391,7 +1391,6 @@ h2 span {
 }
 
 .tour-booking-button:disabled {
-    cursor: not-allowed;
     opacity: 0.65;
 }
 
@@ -1562,17 +1561,6 @@ h2 span {
     display: block;
 }
 
-.profile-tour-img-placeholder {
-    width: 100%;
-    height: 180px;
-    background: var(--brand-soft);
-    color: var(--brand);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-}
-
 .profile-tour-content {
     padding: 1.2rem;
     flex-grow: 1;
@@ -1584,13 +1572,27 @@ h2 span {
     font-family: var(--serif);
     font-size: 1.5rem;
     line-height: 1.1;
-    margin-bottom: 0.25rem;
 }
 
 .profile-tour-info {
     color: var(--text-soft);
     font-size: 0.84rem;
-    margin-bottom: 0;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.profile-tour-guide {
+    color: var(--text-soft);
+    font-size: 0.83rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+
 }
 
 .profile-divisor {
@@ -1598,13 +1600,12 @@ h2 span {
     border-color: var(--line);
 }
 
-
 .reservation-card-heading {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.4rem;
 }
 
 .reservation-card-heading .profile-tour-title {
@@ -1612,7 +1613,6 @@ h2 span {
     margin: 0;
 }
 
-/* Reservation status */
 .reservation-status {
     flex-shrink: 0;
     padding: 0.4rem 0.65rem;
@@ -1621,6 +1621,9 @@ h2 span {
     font-weight: 800;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .reservation-status-confirmed {
@@ -1638,7 +1641,6 @@ h2 span {
     color: #9c3131;
 }
 
-/* Reservation pills */
 .reservation-pills {
     display: flex;
     flex-wrap: wrap;
@@ -1646,12 +1648,10 @@ h2 span {
     margin-bottom: 1rem;
 }
 
-/* Reservation information */
 .reservation-details {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 0.8rem;
-    margin-bottom: 1rem;
 }
 
 .reservation-detail {
@@ -1663,7 +1663,7 @@ h2 span {
     background: var(--bg-deep);
 }
 
-.reservation-detail>i {
+.reservation-detail-icon {
     flex-shrink: 0;
     margin-top: 0.15rem;
     color: var(--brand);
@@ -1689,71 +1689,181 @@ h2 span {
     line-height: 1.4;
 }
 
-/* Additional guests */
-.reservation-guests {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-}
-
-.reservation-guests>p {
-    margin-bottom: 0.65rem;
-    color: var(--text-soft);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.reservation-guests ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
+.guests-list {
     list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
-.reservation-guests li {
-    display: inline-flex;
+.guests-list li {
+    color: var(--text-soft);
+    font-size: 0.86rem;
+    display: flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.4rem 0.65rem;
-    border-radius: 999px;
-    background: var(--brand-soft);
-    color: var(--brand-dark);
-    font-size: 0.78rem;
-    font-weight: 700;
+    gap: 0.4rem;
 }
 
-/* Card actions */
 .reservation-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.75rem;
+    border-top: 1px solid var(--line);
     margin-top: auto;
     padding-top: 1rem;
 }
 
-.reservation-actions form {
-    margin: 0;
-}
 
-.reservation-locked {
+.cancellation {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     color: var(--text-soft);
-    font-size: 0.75rem;
+    margin-left: auto;
+}
+
+.text-cancellation {
+    font-size: 0.82rem;
     font-weight: 700;
 }
 
-.profile-tour-card-history {
-    opacity: 0.92;
+.btn-blocked {
+    cursor: not-allowed;
 }
 
+.form-page {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.form-page-title {
+    position: sticky;
+    top: 108px;
+}
+
+.form-page-title h1 {
+    font-size: 4.2rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.form-page-title p {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.tour-form {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 2.2rem;
+    box-shadow: var(--shadow-small);
+}
+
+.tour-form-section {
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 1.8rem 0 0;
+    margin-top: 1.8rem;
+}
+
+.tour-form-section.is-first {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.tour-form-section:disabled {
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.tour-form-legend {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    float: none;
+    width: auto;
+    padding: 0;
+}
+
+.day-schedule-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.day-schedule-row:last-child {
+    border-bottom: 0;
+}
+
+.day-check {
+    min-width: 130px;
+    margin: 0;
+}
+
+.day-time-input {
+    max-width: 150px;
+}
+
+.stop-row {
+    align-items: center;
+}
+
+.stop-number {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.existing-photos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.existing-photo {
+    position: relative;
+}
+
+.existing-photo img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+.existing-photo-label {
+    display: block;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-soft);
+    margin-top: 0.2rem;
+}
 
 @media (max-width: 768px) {
 
@@ -1895,6 +2005,19 @@ h2 span {
 
     .profile-btn {
         margin-left: 0;
+    }
+
+    .form-page {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .form-page-title {
+        position: static;
+    }
+
+    .form-page-title h1 {
+        font-size: 3rem;
     }
 
 }

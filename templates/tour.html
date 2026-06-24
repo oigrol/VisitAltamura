@@ -337,9 +337,11 @@
 
 
                         {% elif current_user.role == "guide" %}
-                        <button class="btn btn-brand tour-booking-button" type="button" disabled>
-                            Guides cannot book tours
-                        </button>
+                        <span class="btn-blocked">
+                            <button class="btn btn-brand tour-booking-button" type="button" disabled>
+                                Guides cannot book tours
+                            </button>
+                        </span>
 
                         <p class="tour-booking-note">
                             Guide accounts can create and manage tours,

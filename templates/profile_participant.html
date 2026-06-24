@@ -8,7 +8,7 @@ My Profile - Visit Altamura
 <section class="section profile-section">
     <div class="container-xl">
 
-        <div class="profile-header reveal reveal-delay-1">
+        <header class="profile-header reveal reveal-delay-1">
             {% if p_participant.profile_img %}
             <img class="profile-avatar" src="{{ url_for('static', filename=p_participant.profile_img) }}"
                 alt="{{ p_participant.first_name }} {{ p_participant.last_name }}">
@@ -19,216 +19,262 @@ My Profile - Visit Altamura
             </span>
             {% endif %}
 
-
             <div class="profile-info">
                 <p class="section-badge"> Local explorer </p>
                 <h1 class="profile-name"> {{ p_participant.first_name }} {{ p_participant.last_name }} </h1>
                 <p class="profile-email"> <i class="bi bi-envelope"></i> {{ p_participant.email }} </p>
             </div>
             <a href="{{ url_for('home') }}#tours" class="btn btn-brand profile-btn"> <i class="bi bi-compass"></i>
-                Explore tours </a>
-            </header>
+                Explore tours
+            </a>
+        </header>
 
-            <div class="row g-3 mt-4 reveal reveal-delay-2">
-                <div class="col-12 col-md-4">
-                    <article class="stats-profile-card">
-                        <i class="bi bi-calendar-event"></i>
-                        <div class="stats-profile-content">
-                            <span>Upcoming tours</span>
-                            <strong>{{ p_totals.upcoming }}</strong>
-                        </div>
-                    </article>
-                </div>
+        <div class="row g-3 mt-4 reveal reveal-delay-2">
+            <div class="col-12 col-md-4">
+                <article class="stats-profile-card">
+                    <i class="bi bi-calendar-event"></i>
+                    <div class="stats-profile-content">
+                        <span>Upcoming tours</span>
+                        <strong>{{ p_totals.upcoming }}</strong>
+                    </div>
+                </article>
+            </div>
 
-                <div class="col-12 col-md-4">
-                    <article class="stats-profile-card">
-                        <i class="bi bi-people"></i>
-                        <div class="stats-profile-content">
-                            <span>Reserved places</span>
-                            <strong>{{ p_totals.people }}</strong>
-                        </div>
-                    </article>
-                </div>
+            <div class="col-12 col-md-4">
+                <article class="stats-profile-card">
+                    <i class="bi bi-people"></i>
+                    <div class="stats-profile-content">
+                        <span>Reserved places</span>
+                        <strong>{{ p_totals.people }}</strong>
+                    </div>
+                </article>
+            </div>
 
-                <div class="col-12 col-md-4">
-                    <article class="stats-profile-card">
-                        <i class="bi bi-check2-circle"></i>
-                        <div class="stats-profile-content">
-                            <span>Completed tours</span>
-                            <strong>{{ p_totals.completed }}</strong>
-                        </div>
-                    </article>
+            <div class="col-12 col-md-4">
+                <article class="stats-profile-card">
+                    <i class="bi bi-check2-circle"></i>
+                    <div class="stats-profile-content">
+                        <span>Completed tours</span>
+                        <strong>{{ p_totals.completed }}</strong>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <section class="mt-5 reveal reveal-delay-2">
+            <div class="section-title">
+                <div>
+                    <p class="section-badge"> Your reservations </p>
+                    <h2> Upcoming <span>experiences.</span> </h2>
                 </div>
             </div>
 
-            <section class="mt-5 reveal reveal-delay-2">
-                <div class="section-title">
-                    <div>
-                        <p class="section-badge"> Your reservations </p>
-                        <h2> Upcoming <span>experiences.</span> </h2>
-                    </div>
-                </div>
+            {% if p_upcoming_reservations %}
+            <div class="row g-4">
+                {% for reservation_data in p_upcoming_reservations %}
+                <div class="col-12 col-lg-6">
+                    <article class="profile-tour-card">
+                        <img class="profile-tour-img"
+                            src="{{ url_for( 'static', filename=reservation_data.reservation.path_img ) }}"
+                            alt="{{ reservation_data.reservation.tour_title }}">
 
-                {% if p_upcoming_reservations %}
-                <div class="row g-4">
-                    {% for item in p_upcoming_reservations %}
-                    <div class="col-12 col-lg-6">
-                        <article class="profile-tour-card">
-                            <img class="profile-tour-img" src="{{ url_for( 'static', filename=item.path_img ) }}"
-                                alt="{{ item.tour_title }}">
-
-                            <div class="profile-tour-content">
-                                <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                                    <h3 class="profile-tour-title"> {{ item.tour_title }} </h3>
-                                    <!--<span class="reservation-status reservation-status-confirmed"> Confirmed </span>-->
-                                </div>
-
-                                <div class="reservation-pills">
-                                    <span class="pills"> <i class="bi bi-translate"></i> {{ item.language }} </span>
-                                    <span class="pills"> <i class="bi bi-calendar-event"></i> {{ item.tour_date }}
-                                    </span> <span class="pills"> <i class="bi bi-clock"></i> {{ item.start_time or "Not
-                                        available" }} </span>
-                                </div>
-
-                                <div class="reservation-details">
-                                    <div class="reservation-detail"> <i class="bi bi-geo-alt-fill"></i>
-                                        <div> <span>Meeting point</span> <strong> {{ item.meeting_point }} </strong>
-                                        </div>
-                                    </div>
-
-                                    <div class="reservation-detail"> <i class="bi bi-people-fill"></i>
-                                        <div>
-                                            <span>Reservation for</span>
-                                            <strong> {{ item.people_count }}
-                                                {% if item.people_count == 1 %}
-                                                person
-                                                {% else %}
-                                                people
-                                                {% endif %}
-                                            </strong>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {% if item.guests %}
-                                <div class="reservation-guests">
-                                    <p> Additional participants </p>
-                                    <ul>
-                                        {% for guest in item.guests %}
-                                        <li> <i class="bi bi-person"></i>
-                                            {{ guest.first_name }} {{ guest.last_name }}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-
-                                <div class="reservation-actions">
-                                    <a href="{{ url_for( 'tour', tour_id=item.tour_id ) }}"
-                                        class="btn btn-sm btn-link-brand">
-                                        <i class="bi bi-eye"></i> View tour </a>
-                                    {% if item.can_cancel %}
-                                    <span class="reservation-available">
-                                        <i class="bi bi-clock-history"></i> Cancellation still
-                                        available
-                                    </span>
-                                    {% else %}
-                                    <span class="reservation-locked"> <i class="bi bi-lock"></i> Cancellation deadline
-                                        passed </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                {% else %}
-                <div class="no-found"> <i class="bi bi-calendar2 no-found-icon"></i>
-                    <h3 class="fs-2 mb-2"> No upcoming tours </h3>
-                    <p class="mb-3"> Explore the available tours and reserve your next experience in Altamura. </p> <a
-                        class="btn btn-brand" href="{{ url_for('home') }}#tours"> <i class="bi bi-compass"></i>
-                        Explore tours </a>
-                </div>
-                {% endif %}
-            </section>
-
-            <hr class="profile-divisor reveal reveal-delay-3">
-
-            <section class="mt-5 reveal reveal-delay-4">
-                <div class="section-title">
-                    <div>
-                        <p class="section-badge"> Your history </p>
-                        <h2> Previous <span>reservations.</span> </h2>
-                    </div>
-                </div>
-
-                {% if p_reservation_history %}
-                <div class="row g-4">
-                    {% for item in p_reservation_history %}
-                    <div class="col-12 col-lg-6">
-                        <article class="profile-tour-card profile-tour-card-history">
-                            <img class="profile-tour-img" src="{{ url_for( 'static', filename=item.path_img ) }}"
-                                alt="{{ item.tour_title }}">
-
-                            <div class="profile-tour-content">
+                        <div class="profile-tour-content">
+                            <div>
                                 <div class="reservation-card-heading">
-                                    <h3 class="profile-tour-title"> {{ item.tour_title }} </h3>
-                                    {% if item.status == "cancelled" %}
-                                    <span class="reservation-status reservation-status-cancelled"> Cancelled </span>
-                                    {% else %}
-                                    <span class="reservation-status reservation-status-completed"> Completed </span>
-                                    {% endif %}
+                                    <h3 class="profile-tour-title"> {{ reservation_data.reservation.tour_title }} </h3>
+                                    <span class="reservation-status reservation-status-confirmed"> <i
+                                            class="bi bi-check-circle-fill"></i>Confirmed </span>
                                 </div>
-                                <div class="reservation-pills">
-                                    <span class="pills"> <i class="bi bi-calendar-event"></i>
-                                        {{ item.tour_date }}
-                                    </span>
-                                    <span class="pills"> <i class="bi bi-clock"></i>
-                                        {{ item.start_time or "Not available" }} </span>
-                                    <span class="pills"> <i class="bi bi-people"></i>
-                                        {{ item.people_count }}
-                                        {% if item.people_count == 1 %}
-                                        person
-                                        {% else %}
-                                        people
-                                        {% endif %}
-                                    </span>
-                                </div>
-                                <p class="profile-tour-info"> <i class="bi bi-geo-alt"></i>
-                                    {{ item.meeting_point }} </p>
+                                <p class="profile-tour-guide">
+                                    <i class="bi bi-compass"></i>
+                                    Guide: {{ reservation_data.reservation.guide_first_name }} {{
+                                    reservation_data.reservation.guide_last_name }}
+                                </p>
+                            </div>
+                            <div class="reservation-pills">
+                                <span class="pills"> <i class="bi bi-translate"></i>
+                                    {{ reservation_data.reservation.language }}
+                                </span>
+                                <span class="pills"> <i class="bi bi-calendar-event"></i>
+                                    {{ reservation_data.reservation.tour_date }}
+                                </span>
+                                <span class="pills"> <i class="bi bi-clock"></i>
+                                    {{ reservation_data.start_time or "-" }}
+                                </span>
+                            </div>
 
-                                {% if item.guests %}
-                                <div class="reservation-guests">
-                                    <p> Additional participants </p>
-                                    <ul>
-                                        {% for guest in item.guests %}
-                                        <li> <i class="bi bi-person"></i> {{ guest.first_name }} {{ guest.last_name }}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
+                            <div class="reservation-details">
+                                <div class="reservation-detail"> <i class="bi bi-geo-alt-fill reservation-detail-icon"></i>
+                                    <div> <span>Meeting point</span> <strong> {{
+                                            reservation_data.reservation.meeting_point }}
+                                        </strong>
+                                    </div>
                                 </div>
-                                {% endif %}
-                                <div class="reservation-actions">
-                                    <a href="{{ url_for( 'tour', tour_id=item.tour_id ) }}"
-                                        class="btn btn-sm btn-link-brand"> <i class="bi bi-eye"></i> View tour </a>
+
+                                <div class="reservation-detail"> <i class="bi bi-people-fill reservation-detail-icon"></i>
+                                    <div>
+                                        <span>Reservation for</span>
+                                        <strong> {{ reservation_data.reservation.people_count }}
+                                            {% if reservation_data.reservation.people_count == 1 %}
+                                            person
+                                            {% else %}
+                                            people
+                                            {% endif %}
+                                        </strong>
+                                    </div>
                                 </div>
                             </div>
-                        </article>
-                    </div>
-                    {% endfor %}
+
+                            {% if reservation_data.guests %}
+                            <div class="mt-3">
+                                <p class="form-label mb-1">Additional guests:</p>
+                                <ul class="guests-list">
+                                    {% for guest in reservation_data.guests %}
+                                    <li> <i class="bi bi-person"></i>
+                                        {{ guest.first_name }} {{ guest.last_name }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="reservation-actions">
+                                <a href="{{ url_for( 'tour', tour_id=reservation_data.reservation.tour_id ) }}"
+                                    class="btn btn-sm btn-link-brand">
+                                    <i class="bi bi-eye me-1"></i> View tour </a>
+                                {% if reservation_data.cancellable %}
+                                <form method="post"
+                                    action="{{ url_for('home', reservation_id=reservation_data.reservation.id) }}">
+                                    <!--onsubmit="return confirm('Are you sure you want to cancel this reservation? This action cannot be undone.')">-->
+                                    <button class="btn btn-sm cancellation" type="submit">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Cancel reservation
+                                    </button>
+                                </form> {% else %}
+                                <span class="cancellation text-cancellation btn-blocked"> <i class="bi bi-lock"></i>
+                                    Cancellation deadline has passed (24h before the tour).</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
                 </div>
-                {% else %}
-                <div class="no-found">
-                    <i class="bi bi-clock-history no-found-icon"></i>
-                    <h3 class="fs-2 mb-2"> No previous reservations </h3>
-                    <p class="mb-3"> Your completed and cancelled reservations will appear here. </p>
-                    <a class="btn btn-brand" href="{{ url_for('home') }}#tours">
-                        <i class="bi bi-map me-1"></i>Explore tours
-                    </a>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="no-found"> <i class="bi bi-calendar2 no-found-icon"></i>
+                <h3 class="fs-2 mb-2"> No upcoming tours </h3>
+                <p class="mb-3"> Explore the available tours and reserve your next free walking tour in Altamura. </p>
+                <a class="btn btn-brand" href="{{ url_for('home') }}#tours"> <i class="bi bi-compass"></i>
+                    Explore tours </a>
+            </div>
+            {% endif %}
+        </section>
+
+        <hr class="profile-divisor reveal reveal-delay-3">
+
+        <section class="mt-5 reveal reveal-delay-4">
+            <div class="section-title">
+                <div>
+                    <p class="section-badge"> Your history </p>
+                    <h2> Previous <span>reservations.</span> </h2>
                 </div>
-                {% endif %}
-            </section>
-        </div>
+            </div>
+
+            {% if p_reservation_history %}
+            <div class="row g-4">
+                {% for reservation_data in p_reservation_history %}
+                <div class="col-12 col-lg-6">
+                    <article class="profile-tour-card">
+                        <img class="profile-tour-img"
+                            src="{{ url_for( 'static', filename=reservation_data.reservation.path_img ) }}"
+                            alt="{{ reservation_data.reservation.tour_title }}">
+
+                        <div class="profile-tour-content">
+                            <div>
+                                <div class="reservation-card-heading">
+                                    <h3 class="profile-tour-title"> {{ reservation_data.reservation.tour_title }} </h3>
+                                    {% if reservation_data.reservation.status == "cancelled" %}
+                                    <span class="reservation-status reservation-status-cancelled"> <i
+                                            class="bi bi-x-circle-fill"></i> Cancelled </span>
+                                    {% else %}
+                                    <span class="reservation-status reservation-status-completed"> <i
+                                            class="bi bi-check-circle-fill"></i> Completed </span>
+                                    {% endif %}
+                                </div>
+                                <p class="profile-tour-guide">
+                                    <i class="bi bi-compass"></i>
+                                    Guide: {{ reservation_data.reservation.guide_first_name }} {{
+                                    reservation_data.reservation.guide_last_name }}
+                                </p>
+                            </div>
+                            <div class="reservation-pills">
+                                <span class="pills"> <i class="bi bi-translate"></i>
+                                    {{ reservation_data.reservation.language }}
+                                </span>
+                                <span class="pills"> <i class="bi bi-calendar-event"></i> {{
+                                    reservation_data.reservation.tour_date }}
+                                </span>
+                                <span class="pills"> <i class="bi bi-clock"></i>
+                                    {{ reservation_data.start_time or "-" }}
+                                </span>
+                            </div>
+
+                            <div class="reservation-details">
+                                <div class="reservation-detail"> <i class="bi bi-geo-alt-fill reservation-detail-icon"></i>
+                                    <div> <span>Meeting point</span> <strong> {{
+                                            reservation_data.reservation.meeting_point }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <div class="reservation-detail"> <i class="bi bi-people-fill reservation-detail-icon"></i>
+                                    <div>
+                                        <span>Reservation for</span>
+                                        <strong> {{ reservation_data.reservation.people_count }}
+                                            {% if reservation_data.reservation.people_count == 1 %}
+                                            person
+                                            {% else %}
+                                            people
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if reservation_data.guests %}
+                            <div class="mt-3">
+                                <p class="form-label mb-1">Additional guests:</p>
+                                <ul class="guests-list">
+                                    {% for guest in reservation_data.guests %}
+                                    <li> <i class="bi bi-person"></i>
+                                        {{ guest.first_name }} {{ guest.last_name }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="reservation-actions">
+                                <a href="{{ url_for( 'tour', tour_id=reservation_data.reservation.tour_id ) }}"
+                                    class="btn btn-sm btn-link-brand"> <i class="bi bi-eye me-1"></i> View tour </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-found">
+                <i class="bi bi-clock-history no-found-icon"></i>
+                <h3 class="fs-2 mb-2"> No previous reservations </h3>
+                <p class="mb-3"> Your completed and cancelled reservations will appear here. </p>
+                <a class="btn btn-brand" href="{{ url_for('home') }}#tours">
+                    <i class="bi bi-map me-1"></i>Explore tours
+                </a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
 </section>
 {% endblock %}

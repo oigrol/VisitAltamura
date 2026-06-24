@@ -205,6 +205,22 @@ def reservations_by_language():
 
     return db_data
 
+def get_dates_with_confirmed_reservations_for_tour(p_tour_id):
+    query = "SELECT R.tour_date, WP.start_time, SUM(R.people_count) AS expected_people FROM reservations R, tour_weekly_plan WP WHERE R.tour_id = WP.tour_id AND WP.day_of_week = (strftime('%w', R.tour_date) + 6) % 7 AND R.tour_id = ? AND R.status = 'confirmed' GROUP BY R.tour_date, WP.start_time ORDER BY R.tour_date, WP.start_time"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_tour_id,))
+    db_dates = cursor.fetchall()
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return db_dates
+
 #
 def get_reservations_for_participant(p_participant_id):
     query = """
