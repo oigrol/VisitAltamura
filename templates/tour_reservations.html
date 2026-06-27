@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Reservations — {{ p_tour.title }} · Visit Altamura{% endblock %}
+
+{% block content %}
+<section class="section profile-section">
+    <div class="container-xl">
+
+        <header class="reservation-header reveal reveal-delay-1">
+            <div>
+                <p class="section-badge">Tour management</p>
+                <h1 class="profile-name">{{ p_tour.title }}</h1>
+
+                <div class="reservation-pills">
+                    <span class="pills"><i class="bi bi-translate"></i> {{ p_tour.language }}</span>
+                    <span class="pills"><i class="bi bi-clock"></i> {{ p_tour.duration }} min</span>
+                    <span class="pills"><i class="bi bi-geo-alt"></i> {{ p_tour.meeting_point }}</span>
+                    <span class="pills"><i class="bi bi-people"></i> max {{ p_tour.max_participants }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-center justify-content-end">
+                <a href="{{ url_for('tour', tour_id=p_tour.id) }}" class="btn btn-link-brand">
+                    <i class="bi bi-eye me-1"></i>View tour
+                </a>
+                <a href="{{ url_for('profile_guide') }}" class="btn btn-link-brand">
+                    <i class="bi bi-arrow-left me-1"></i>Back to profile
+                </a>
+            </div>
+        </header>
+
+        <div class="row g-3 reveal reveal-delay-2">
+            <div class="col-12 col-md-4">
+                <article class="stats-reservation-card">
+                    <i class="bi bi-calendar-week tr-stat-icon"></i>
+                    <div class="stats-reservation-content">
+                        <span>Upcoming reservations</span>
+                        <strong> {{ p_totals.upcoming_reservations }}</strong>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <article class="stats-reservation-card">
+                    <i class="bi bi-people"></i>
+                    <div class="stats-reservation-content">
+                        <span>Pending reports</span>
+                        <strong> {{ p_totals.pending_reports }}</strong>
+                    </div>
+
+                </article>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <article class="stats-reservation-card">
+                    <i class="bi bi-calendar-week"></i>
+                    <div class="stats-reservation-content">
+                        <span>Completed reports</span>
+                        <strong> {{ p_totals.completed_reports }}</strong>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="section-title mt-5 reveal reveal-delay-1">
+            <div>
+                <p class="section-badge">Next occurrences</p>
+                <h2>Upcoming <span>Reservations</span></h2>
+            </div>
+        </div>
+
+        {% if p_upcoming_reservations %}
+        <div class="d-flex flex-column gap-2 mb-5">
+            {% for reservation in p_upcoming_reservations %}
+            <article class="reservation-card upcoming reveal reveal-delay-{{ (loop.index0 % 5) }}">
+
+                <div class="reservation-card-date">
+                    <span class="day">{{ reservation.tour_date[8:10] }}</span>
+                    <span class="month">{{ p_months[reservation.tour_date[5:7] | int] }}</span>
+                </div>
+
+                <div class="reservation-card-content">
+                    <div class="reservation-card-info">
+                        <span class="reservation-time">
+                            <i class="bi bi-clock"></i>
+                            {{ reservation.start_time }}
+                        </span>
+
+                        <span>
+                            <i class="bi bi-people"></i>
+                            {{ reservation.expected_people }} / {{ p_tour.max_participants }} people booked
+                        </span>
+                    </div>
+
+                    <div class="reservation-card-people">
+                        <div class="reservation-card-people-text">
+                            <span>Tour occupancy</span>
+                            <strong>
+                                {{ reservation.expected_people }} of {{ p_tour.max_participants }} places
+                            </strong>
+                        </div>
+
+                        <div class="reservation-card-people-bar" role="progressbar" aria-label="Tour occupancy"
+                            aria-valuenow="{{ reservation.expected_people }}" aria-valuemin="0"
+                            aria-valuemax="{{ p_tour.max_participants }}">
+                            <span
+                                style="width: {{ (reservation.expected_people * 100 / p_tour.max_participants) | round(0) }}%;"></span>
+                        </div>
+                    </div>
+
+                    <div class="reservation-card-guests">
+                        {% for res in reservation.reservations %}
+                        {% set guests = reservation.guests_per_reservation[res.id] %}
+
+                        <div class="reservation-card-guests-block">
+                            <div class="reservation-card-guests-avatar">
+                                {{ res.participant_first_name[0] | upper }}{{ res.participant_last_name[0] | upper }}
+                            </div>
+
+                            <div class="reservation-card-guests-info">
+                                <strong>
+                                    {{ res.participant_first_name }} {{ res.participant_last_name }}
+                                </strong>
+
+                                {% if guests or res.people_count > 1 %}
+                                <span>
+                                    {{ res.people_count }} people
+                                    {% if guests %}
+                                    ·
+                                    {% for guest in guests %}
+                                    {{ guest.first_name }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% endif %}
+                                </span>
+                                {% else %}
+                                <span>1 participant</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <p class="reservation-card-guests-empty">
+                            No confirmed participants yet.
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="reservation-card-side">
+                    <span class="reservation-status status-upcoming">
+                        <i class="bi bi-calendar-check"></i>
+                        Upcoming
+                    </span>
+
+                    <small>No action required</small>
+                </div>
+
+            </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="no-found reservations-empty-state reveal reveal-delay-2 mb-5">
+            <i class="bi bi-calendar-x no-found-icon mb-2"></i>
+            <h3 class="fs-4 mb-2">No upcoming occurrences</h3>
+            <p class="mb-0 text-muted">
+                There are no future reservations for this tour yet.
+            </p>
+        </div>
+        {% endif %}
+
+        <hr class="profile-divisor reveal reveal-delay-2">
+
+        <div class="section-title mt-5 reveal reveal-delay-1">
+            <div>
+                <p class="section-badge">Action required</p>
+                <h2>Pending <span>Reports.</span></h2>
+            </div>
+        </div>
+
+        {% if p_pending_reports_reservations %}
+        <div class="d-flex flex-column gap-2 mb-5">
+            {% for reservation in p_pending_reports_reservations %}
+            <article class="reservation-card upcoming reveal reveal-delay-{{ (loop.index0 % 5) }}">
+
+                <div class="reservation-card-date">
+                    <span class="day">{{ reservation.tour_date[8:10] }}</span>
+                    <span class="month">{{ p_months[reservation.tour_date[5:7] | int] }}</span>
+                </div>
+
+                <div class="reservation-card-content">
+                    <div class="reservation-card-info">
+                        <span class="reservation-time">
+                            <i class="bi bi-clock"></i>
+                            {{ reservation.start_time }}
+                        </span>
+
+                        <span>
+                            <i class="bi bi-people"></i>
+                            {{ reservation.expected_people }} people expected
+                        </span>
+                    </div>
+
+                    <div class="reservation-card-guests">
+                        {% for res in reservation.reservations %}
+                        {% set guests = reservation.guests_per_reservation[res.id] %}
+
+                        <div class="reservation-card-guests-block">
+                            <div class="reservation-card-guests-avatar">
+                                {{ res.participant_first_name[0] | upper }}{{ res.participant_last_name[0] | upper }}
+                            </div>
+
+                            <div class="reservation-card-guests-info">
+                                <strong>
+                                    {{ res.participant_first_name }} {{ res.participant_last_name }}
+                                </strong>
+
+                                {% if guests or res.people_count > 1 %}
+                                <span>
+                                    {{ res.people_count }} people
+                                    {% if guests %}
+                                    ·
+                                    {% for guest in guests %}
+                                    {{ guest.first_name }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% endif %}
+                                </span>
+                                {% else %}
+                                <span>1 participant</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <p class="reservation-card-guests-empty">
+                            No confirmed participants yet.
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="reservation-card-side">
+                    <span class="reservation-status status-pending">
+                        <i class="bi bi-exclamation-circle"></i>
+                        Report due
+                    </span>
+
+                    <button type="button" href="{{ url_for('tour_report', tour_id=p_tour.id, tour_date=reservation.tour_date) }}" class="btn btn-brand w-100">
+                        <i class="bi bi-pencil-square me-1"></i>
+                        Complete report
+                    </button>
+                </div>
+
+            </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="no-found reservations-empty-state reveal reveal-delay-2 mb-5">
+            <i class="bi bi-clipboard-check no-found-icon mb-2"></i>
+            <h3 class="fs-4 mb-2">You're all caught up!</h3>
+            <p class="mb-0 text-muted">
+                There are no missing reports for this tour.
+            </p>
+        </div>
+        {% endif %}
+
+        <hr class="profile-divisor reveal reveal-delay-2">
+
+        <div class="section-title reservations-section-title reveal reveal-delay-1">
+            <div>
+                <p class="section-badge">History</p>
+                <h2>Completed <span>reports.</span></h2>
+            </div>
+        </div>
+
+        {% if p_completed_reports_reservations %}
+        <div class="row g-4">
+            {% for reservation in p_completed_reports_reservations %}
+            <article class="col-12 col-lg-6 reveal reveal-delay-{{ (loop.index0 % 5) }}">
+                <div class="profile-tour-card completed-report-card">
+                    <div class="completed-report-image-wrapper">
+                        <img class="profile-tour-img completed-report-image"
+                            src="{{ url_for('static', filename=reservation.report.group_img) }}"
+                            alt="Report image for{{ p_tour.title }}">
+                    </div>
+
+                    <div class="profile-tour-content">
+                        <div class="completed-report-heading">
+                            <div>
+                                <p class="completed-report-label">Tour report</p>
+                                <h3 class="profile-tour-title">{{ p_tour.title }}</h3>
+                            </div>
+
+                            <span class="reservation-status reservation-status-completed">
+                                <i class="bi bi-check2"></i>
+                                Completed
+                            </span>
+                        </div>
+
+                        <div class="report-summary-grid">
+                            <div>
+                                <span>Date time</span>
+                                <strong>{{ reservation.tour_date }} · {{ reservation.start_time }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Expected</span>
+                                <strong>{{ reservation.expected_people }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Attended</span>
+                                <strong>{{ reservation.report.final_participants }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="no-found reservations-empty-state reveal reveal-delay-2 mb-5">
+            <i class="bi bi-image no-found-icon mb-2"></i>
+            <h3 class="fs-4 mb-2">No completed reports</h3>
+            <p class="mb-0 text-muted">
+                Once you submit a report for this tour, it will appear here.
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

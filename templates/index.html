@@ -260,7 +260,7 @@ Home - Visit Altamura
             <p>Create your own recurring tour, shape its itinerary and guide curious visitors through your Altamura.</p>
         </div>
         {% if current_user.is_authenticated and current_user.role == 'guide' %}
-        <a class="btn btn-light btn-lg" href="{{ url_for('home') }}">Create a tour <i
+        <a class="btn btn-light btn-lg" href="{{ url_for('create_tour') }}">Create a tour <i
                 class="bi bi-arrow-right"></i></a>
         {% else %}
         <a class="btn btn-light btn-lg" href="{{ url_for('signup', role='guide') }}">Become a local guide <i

@@ -1,22 +1,67 @@
-from datetime import datetime
+from datetime import date, datetime
 import sqlite3
 
-def get_reservations():
-    query = "SELECT * FROM reservations ORDER BY tour_date, created_at"
+def tominutes(time_str):
+    hours, minutes = time_str.split(':')
+    return int(hours) * 60 + int(minutes)
+
+def new_reservation(p_participant_id, p_tour_id, p_tour_date, p_people_count, p_status):
+    query = "INSERT INTO reservations (participant_id, tour_id, tour_date, people_count, status, created_at, cancelled_at) VALUES (?,?,?,?,?,?,?)"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute(query)
+    cursor.execute(query, (p_participant_id, p_tour_id, p_tour_date, p_people_count, p_status, datetime.now(), None))
 
-    db_reservations = cursor.fetchall()
+    reservation_id = cursor.lastrowid
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return reservation_id
+
+def add_guest_to_reservation(p_reservation_id, p_first_name, p_last_name):
+    query = "INSERT INTO reservation_guests (reservation_id, first_name, last_name) VALUES (?, ?, ?)"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_reservation_id, p_first_name, p_last_name))
 
     conn.commit()
     cursor.close()
     conn.close()
 
-    return db_reservations
+def cancel_reservation(p_reservation_id):
+    query = "UPDATE reservations SET status = 'cancelled', cancelled_at = ? WHERE id = ?"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    cursor = conn.cursor()
+
+    cursor.execute(query, (datetime.now(), p_reservation_id))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return True
+
+def get_reservation(p_participant_id, p_tour_id, p_tour_date):
+    query = "SELECT * FROM reservations WHERE participant_id = ? AND tour_id = ? AND tour_date = ? AND status = 'confirmed'"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_participant_id, p_tour_id, p_tour_date))
+
+    db_reservation = cursor.fetchone()
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return db_reservation
 
 def get_reservations_for_participant(p_participant_id):
     query = "SELECT R.*, T.title AS tour_title, T.meeting_point, T.duration, T.language, U.first_name AS guide_first_name, U.last_name AS guide_last_name FROM reservations R, tours T, users U WHERE R.tour_id = T.id AND T.guide_id = U.id AND R.participant_id = ? ORDER BY R.tour_date"
@@ -135,60 +180,6 @@ def count_people_for_tour_date(p_tour_id, p_tour_date):
 
     return count
 
-def get_reservation(p_participant_id, p_tour_id, p_tour_date):
-    query = "SELECT * FROM reservations WHERE participant_id = ? AND tour_id = ? AND tour_date = ? AND status = 'confirmed'"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_participant_id, p_tour_id, p_tour_date))
-
-    db_reservation = cursor.fetchone()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_reservation
-
-def new_reservation(p_participant_id, p_tour_id, p_tour_date, p_num_guests, p_status):
-    query = "INSERT INTO reservations (participant_id, tour_id, tour_date, people_count, status, created_at, cancelled_at) VALUES (?,?,?,?,?,?,?)"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_participant_id, p_tour_id, p_tour_date, p_num_guests, p_status, datetime.now(), None))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-def add_guest_to_reservation(p_reservation_id, p_first_name, p_last_name):
-    query = "INSERT INTO reservation_guests (reservation_id, first_name, last_name) VALUES (?,?,?)"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_reservation_id, p_first_name, p_last_name))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-def cancel_reservation(p_reservation_id):
-    query = "UPDATE reservations SET status = 'cancelled', cancelled_at = ? WHERE id = ?"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    cursor = conn.cursor()
-
-    cursor.execute(query, (datetime.now(), p_reservation_id))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return True
-
 def reservations_by_language():
     query = "SELECT T.language, COUNT(R.id) AS num_reservations, SUM(R.people_count) AS people_count FROM reservations R, tours T WHERE R.tour_id = T.id AND R.status = 'confirmed' GROUP BY T.language ORDER BY num_reservations DESC, T.language"
 
@@ -207,6 +198,7 @@ def reservations_by_language():
 
 def get_dates_with_confirmed_reservations_for_tour(p_tour_id):
     query = "SELECT R.tour_date, WP.start_time, SUM(R.people_count) AS expected_people FROM reservations R, tour_weekly_plan WP WHERE R.tour_id = WP.tour_id AND WP.day_of_week = (strftime('%w', R.tour_date) + 6) % 7 AND R.tour_id = ? AND R.status = 'confirmed' GROUP BY R.tour_date, WP.start_time ORDER BY R.tour_date, WP.start_time"
+    #already ordered by date and time ASC, so no need to order again
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     conn.row_factory = sqlite3.Row
@@ -221,56 +213,32 @@ def get_dates_with_confirmed_reservations_for_tour(p_tour_id):
 
     return db_dates
 
-#
-def get_reservations_for_participant(p_participant_id):
-    query = """
-        SELECT
-            R.*,
-            T.title AS tour_title,
-            T.meeting_point,
-            T.duration,
-            T.language,
-            T.max_participants,
-            U.first_name AS guide_first_name,
-            U.last_name AS guide_last_name,
-            WP.start_time,
-            (
-                SELECT TI.path_img
-                FROM tour_images TI
-                WHERE TI.tour_id = T.id
-                ORDER BY TI.position
-                LIMIT 1
-            ) AS path_img
-        FROM reservations R
-        JOIN tours T
-            ON T.id = R.tour_id
-        JOIN users U
-            ON U.id = T.guide_id
-        LEFT JOIN tour_weekly_plan WP
-            ON WP.tour_id = R.tour_id
-            AND WP.day_of_week = (
-                (
-                    CAST(strftime('%w', R.tour_date) AS INTEGER)
-                    + 6
-                ) % 7
-            )
-        WHERE R.participant_id = ?
-        ORDER BY R.tour_date, WP.start_time
-    """
+
+def check_conflicting_reservation(p_participant_id, p_tour_date, p_tour_id, p_start_time, p_duration):
+    weekday = date.fromisoformat(p_tour_date).weekday()
+
+    query = "SELECT R.id, T.duration, WP.start_time FROM reservations R, tours T, tour_weekly_plan WP WHERE R.tour_id = T.id AND T.id = WP.tour_id AND WP.day_of_week = ? AND R.participant_id = ? AND R.tour_date = ? AND R.tour_id != ? AND R.status = 'confirmed'"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute(
-        query,
-        (p_participant_id,),
-    )
+    cursor.execute(query, (weekday, p_participant_id, p_tour_date, p_tour_id))
 
-    db_reservations = cursor.fetchall()
+    existing_reservations = cursor.fetchall()
 
     conn.commit()
     cursor.close()
     conn.close()
 
-    return db_reservations
+    new_start_time = tominutes(p_start_time)
+    new_end_time = new_start_time + int(p_duration)
+
+    for reservation in existing_reservations:
+        existing_start_time = tominutes(reservation['start_time'])
+        existing_end_time = existing_start_time + int(reservation['duration'])
+
+        if (new_start_time < existing_end_time) and (new_end_time > existing_start_time):
+            return True
+
+    return False

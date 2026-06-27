@@ -29,7 +29,7 @@ My Profile - Visit Altamura
                     {% endfor %}
                 </div>
             </div>
-            <a href="{{ url_for('home') }}#tours" class="btn btn-brand profile-btn">
+            <a href="{{ url_for('create_tour') }}" class="btn btn-brand profile-btn">
                 <i class="bi bi-plus-lg me-1"></i>Create a tour
             </a>
         </header>
@@ -58,10 +58,10 @@ My Profile - Visit Altamura
 
             <div class="col-12 col-md-4">
                 <article class="stats-profile-card">
-                    <i class="bi bi-clipboard-check" aria-hidden="true"></i>
+                    <i class="bi bi-calendar-week"></i>
                     <div class="stats-profile-content">
-                        <span>Reports to complete</span>
-                        <strong> {{ p_totals.missing_reports }}</strong>
+                        <span>Active reservations</span>
+                        <strong> {{ p_totals.reservations }}</strong>
                     </div>
                 </article>
             </div>
@@ -96,6 +96,25 @@ My Profile - Visit Altamura
                                 <i class="bi bi-people"></i> Max {{ tour_data.tour.max_participants }}
                             </p>
 
+                            {% if tour_data.next_reservations %}
+                            <div class="mini-occurrences">
+                                {% for occurrence in tour_data.next_reservations %}
+                                <div><span><i class="bi bi-calendar-event me-1"></i> {{ occurrence.tour_date }} ·
+                                        {{occurrence.start_time}}</span><strong>{{ occurrence.expected_people }}/{{
+                                        occurrence.total_people}} </strong>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="mini-occurrences">
+                                <div><span><i class="bi bi-calendar-event me-2"></i>No upcoming occurrences.</span>
+                                </div>
+                            </div>
+
+
+                            {% endif %}
+
+
                             <div class="reservation-actions">
 
                                 <a href="{{ url_for('tour', tour_id=tour_data.tour.id) }}"
@@ -111,8 +130,7 @@ My Profile - Visit Altamura
                                 </a>
                                 {% if not tour_data.has_reservations %}
                                 <form method="post" action="{{ url_for('delete_tour', tour_id=tour_data.tour.id) }}"
-                                    class="cancellation">
-                                    <!--onsubmit="return confirm('Are you sure you want to delete this tour? This action cannot be undone.')">-->
+                                    class="cancellation delete-form" data-title="{{ tour_data.tour.title }}">
                                     <button class="btn btn-sm" type="submit">
                                         <i class="bi bi-trash"></i>
                                         Delete
@@ -135,7 +153,7 @@ My Profile - Visit Altamura
                 <i class="bi bi-map no-found-icon"></i>
                 <h3 class="fs-2 mb-2">No tours yet</h3>
                 <p class="mb-3">Create your first tour and start sharing your Altamura with visitors.</p>
-                <a class="btn btn-brand" href="{{ url_for('home') }}">
+                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
                     <i class="bi bi-plus-lg me-1"></i>Create your first tour
                 </a>
             </div>
@@ -196,8 +214,8 @@ My Profile - Visit Altamura
                 <i class="bi bi-clipboard-check no-found-icon"></i>
                 <h3 class="fs-2 mb-2">No reports to complete</h3>
                 <p class="mb-3">You have no pending reports. Great job!</p>
-                <a class="btn btn-brand" href="{{ url_for('home') }}#tours">
-                    <i class="bi bi-map me-1"></i>Explore tours
+                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
+                    <i class="bi bi-map me-1"></i>Create a tour
                 </a>
             </div>
             {% endif %}
@@ -256,8 +274,8 @@ My Profile - Visit Altamura
                 <i class="bi bi-clipboard-check no-found-icon"></i>
                 <h3 class="fs-2 mb-2">No completed reports</h3>
                 <p class="mb-3">You have no completed reports yet.</p>
-                <a class="btn btn-brand" href="{{ url_for('home') }}#tours">
-                    <i class="bi bi-map me-1"></i>Explore tours
+                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
+                    <i class="bi bi-map me-1"></i>Create a tour
                 </a>
             </div>
             {% endif %}
