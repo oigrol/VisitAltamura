@@ -70,7 +70,6 @@ h2 span {
     opacity: 0.6;
 }
 
-/* effect: north-west */
 .bg-effect-1 {
     width: 350px;
     height: 350px;
@@ -79,7 +78,6 @@ h2 span {
     background: var(--brand);
 }
 
-/* effect: south-est */
 .bg-effect-2 {
     width: 450px;
     height: 450px;
@@ -1442,6 +1440,10 @@ h2 span {
     color: var(--brand);
 }
 
+.tour-empty p {
+    margin: 0;
+}
+
 /* PROFILE PAGE */
 
 .profile-section,
@@ -2191,6 +2193,9 @@ h2 span {
     font-size: 0.92rem;
 }
 
+
+/* ADMIN PAGE */
+
 .admin-layout {
     display: flex;
     min-height: 100vh;
@@ -2219,7 +2224,7 @@ h2 span {
     border-bottom: 1px solid var(--line);
 }
 
-.admin-sidebar-brand>.bi {
+.admin-sidebar-brand .bi {
     font-size: 1.6rem;
     color: var(--brand);
 }
@@ -2233,7 +2238,7 @@ h2 span {
     line-height: 1.2;
 }
 
-.admin-sidebar-sub {
+.admin-sidebar-subtitle {
     font-size: 0.72rem;
     color: var(--text-soft);
     margin: 0;
@@ -2248,7 +2253,7 @@ h2 span {
     flex: 1;
 }
 
-.admin-nav-label {
+.admin-nav-title {
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -2266,7 +2271,7 @@ h2 span {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-soft);
-    transition: background 0.18s, color 0.18s;
+    transition: background-color 0.18s, color 0.18s;
     cursor: pointer;
     border: none;
     background: none;
@@ -2274,12 +2279,12 @@ h2 span {
 }
 
 .admin-nav-link:hover {
-    background: var(--bg-deep);
+    background-color: var(--bg-deep);
     color: var(--text);
 }
 
 .admin-nav-link.active {
-    background: var(--brand-soft);
+    background-color: var(--brand-soft);
     color: var(--brand-dark);
     font-weight: 600;
 }
@@ -2319,7 +2324,7 @@ h2 span {
 }
 
 .admin-page-header h1 {
-    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-size: 2.6rem;
     margin: 0;
 }
 
@@ -2809,11 +2814,9 @@ h2 span {
 }
 
 .dark-mode .reservation-card.pending .reservation-card-date {
-    background: linear-gradient(
-        160deg,
-        var(--brand-soft),
-        var(--bg-deep)
-    );
+    background: linear-gradient(160deg,
+            var(--brand-soft),
+            var(--bg-deep));
 }
 
 .dark-mode .reservation-status-confirmed,
@@ -2855,7 +2858,6 @@ h2 span {
 
     body {
         padding-bottom: 58px;
-        /* space for mobile navbar */
     }
 
     .nav-links {
@@ -3031,6 +3033,10 @@ h2 span {
 
     .admin-main {
         padding: 1.5rem 1rem;
+    }
+
+    .admin-page-header h1 {
+        font-size: 1.8rem;
     }
 
 }

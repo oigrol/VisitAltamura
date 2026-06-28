@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-import email
 import time
 
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -888,6 +887,8 @@ def profile():
         return redirect(url_for("profile_guide"))
     elif user.role == 'participant':
         return redirect(url_for("profile_participant"))
+    elif user.role == 'admin':
+        return redirect(url_for("admin"))
     return redirect(url_for("home"))
 
 @app.route("/profile/guide")

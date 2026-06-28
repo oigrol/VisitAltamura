@@ -210,6 +210,7 @@ def insert_weekly_plan(c):
         (6, 1, "16:00"), (6, 4, "15:00"),  # Tour 6: Tue 16:00, Fri 15:00
         (7, 4, "20:00"), (7, 5, "20:00"),  # Tour 7: Fri 20:00, Sat 20:00
         (8, 5, "09:00"),                   # Tour 8: Sat 09:00
+        (9, 2, "18:00"),                   # Tour 9: Tue 18:00
     ]
     c.executemany("INSERT INTO tour_weekly_plan (tour_id, day_of_week, start_time) VALUES (?,?,?)", plan)
     print(f"  Inserted {len(plan)} weekly schedule slots.")
@@ -453,8 +454,8 @@ def insert_reservations(c):
         (36, 3, 4, "2026-05-03", 2, "confirmed", "2026-04-27 09:00:00", None),
         # May 4 = Mon  → Tour 4 Mon 17:00 ✓
         (37, 4, 4, "2026-05-04", 2, "confirmed", "2026-04-28 10:00:00", None),
-        # Jun 4 = Wed  → Tour 2 Wed 09:00 ✓
-        (38, 2, 4, "2026-06-04", 1, "confirmed", "2026-05-29 09:00:00", None),
+        # Jun 3 = Wed  → Tour 2 Wed 09:00 ✓
+        (38, 2, 4, "2026-06-03", 1, "confirmed", "2026-05-29 09:00:00", None),
         # Jun 6 = Sat  → Tour 1 Sat 10:30 ✓ (was Tour 5 — kept as Tour 1 so Tour 5 has 0 past)
         (39, 1, 4, "2026-06-06", 3, "confirmed", "2026-05-31 08:00:00", None),
         # Jun 13 = Fri → Tour 7 Fri 20:00 ✓  (also Tour 2 Fri, Tour 6 Fri)
@@ -483,8 +484,8 @@ def insert_reservations(c):
         (49, 3, 5, "2026-05-10", 2, "confirmed", "2026-05-04 08:00:00", None),
         # Jun 2 = Tue  → Tour 1 Tue 10:00 ✓
         (50, 1, 5, "2026-06-02", 2, "confirmed", "2026-05-27 10:00:00", None),
-        # Jun 11 = Wed → Tour 2 Wed 09:00 ✓
-        (51, 2, 5, "2026-06-11", 2, "confirmed", "2026-06-05 09:00:00", None),
+        # Jun 10 = Wed → Tour 2 Wed 09:00 ✓
+        (51, 2, 5, "2026-06-10", 2, "confirmed", "2026-06-05 09:00:00", None),
         # Jun 12 = Fri → Tour 6 Fri 15:00 ✓
         (52, 6, 5, "2026-06-12", 1, "confirmed", "2026-06-06 15:00:00", None),
         # Jun 20 = Sat → Tour 8 Sat 09:00 ✓
@@ -517,8 +518,8 @@ def insert_reservations(c):
         (64, 4, 6, "2026-05-25", 2, "confirmed", "2026-05-19 17:00:00", None),
         # Jun 2 = Tue  → Tour 6 Tue 16:00 ✓
         (65, 6, 6, "2026-06-02", 2, "confirmed", "2026-05-27 16:00:00", None),
-        # Jun 4 = Wed  → Tour 2 Wed 09:00 ✓
-        (66, 2, 6, "2026-06-04", 1, "confirmed", "2026-05-29 09:00:00", None),
+        # Jun 3 = Wed  → Tour 2 Wed 09:00 ✓
+        (66, 2, 6, "2026-06-03", 1, "confirmed", "2026-05-29 09:00:00", None),
         # Jun 7 = Sun  → Tour 3 Sun 11:00 ✓
         (67, 3, 6, "2026-06-07", 2, "confirmed", "2026-06-01 11:00:00", None),
         # Jun 21 = Sun → Tour 3 Sun 11:00 ✓ (was Tour 5 — kept as Tour 3 so Tour 5 has 0 past)

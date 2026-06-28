@@ -1,7 +1,0 @@
-Guide 1 (Italian)	valentina@visitaltamura.it	valentina123
-Guide 2 (English + German)	marco@visitaltamura.it	marco123
-Guide 3 (Spanish + Portuguese)	carmen@visitaltamura.it	carmen123
-Participant 1	alice@visitaltamura.it	alice123
-Participant 2	luca@visitaltamura.it	luca123
-Participant 3	emma@visitaltamura.it	emma123
-Admin	admin@visitaltamura.it	admin123
