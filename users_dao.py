@@ -40,23 +40,6 @@ def get_users():
 
     return db_users
 
-def get_id_by_email(p_email):
-    query = "SELECT id FROM users WHERE email = ?"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_email,))
-
-    db_user = cursor.fetchone()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_user
-
 def get_guides():
     query = "SELECT * FROM users WHERE role = 'guide' ORDER BY last_name, first_name"
 
@@ -90,40 +73,6 @@ def count_guides():
 
     return count
 
-def get_guide_by_id(p_id):
-    query = "SELECT * FROM users WHERE id = ?"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_id,))
-
-    db_guide = cursor.fetchone()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_guide
-
-def get_participant_by_id(p_id):
-    query = "SELECT * FROM users WHERE id = ?"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_id,))
-
-    db_participant = cursor.fetchone()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_participant
-
 def get_user_by_id(p_id):
     query = "SELECT * FROM users WHERE id = ?"
 
@@ -143,23 +92,6 @@ def get_user_by_id(p_id):
 
 def get_user_by_email(p_email):
     query = "SELECT * FROM users WHERE email = ?"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_email,))
-
-    db_user = cursor.fetchone()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_user
-
-def get_id_by_email(p_email):
-    query = "SELECT id FROM users WHERE email = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     conn.row_factory = sqlite3.Row

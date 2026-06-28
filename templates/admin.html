@@ -24,11 +24,10 @@
             </a>
 
             <p class="admin-nav-label">Management</p>
-            <a href="#section-users" class="admin-nav-link nav-link">
-                <i class="bi bi-people"></i> Users
-            </a>
-            <a href="#section-tours" class="admin-nav-link nav-link">
-                <i class="bi bi-signpost-split"></i> Tours
+
+            <a href="#section-guides" class="admin-nav-link nav-link">
+                <i class="bi bi-person-badge"></i>
+                Guides and tours
             </a>
         </nav>
 
@@ -49,16 +48,12 @@
                 <p class="section-badge">Platform overview</p>
                 <h1>Administration <span>dashboard.</span></h1>
             </div>
-            <div class="admin-header-meta">
-                <i class="bi bi-clock me-1"></i>
-                <span id="admin-clock"></span>
-            </div>
         </div>
 
-        <div id="section-stats" class="row g-3 mb-5 reveal reveal-delay-2">
-            <div class="col-6 col-xl-3">
+        <div id="section-stats" class="row g-3 mb-5">
+            <div class="col-6 col-xl-3 reveal reveal-delay-2">
                 <article class="admin-stat-card">
-                    <div class="admin-stat-icon" style="--icon-bg: var(--brand-soft); --icon-color: var(--brand);">
+                    <div class="admin-stat-icon guides-icon">
                         <i class="bi bi-compass"></i>
                     </div>
                     <div class="admin-stat-content">
@@ -68,9 +63,9 @@
                     <i class="bi bi-arrow-up-right admin-stat-trend"></i>
                 </article>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-6 col-xl-3 reveal reveal-delay-3">
                 <article class="admin-stat-card">
-                    <div class="admin-stat-icon" style="--icon-bg: #e8f4f0; --icon-color: #2d7d5e;">
+                    <div class="admin-stat-icon participants-icon">
                         <i class="bi bi-backpack"></i>
                     </div>
                     <div class="admin-stat-content">
@@ -80,9 +75,9 @@
                     <i class="bi bi-arrow-up-right admin-stat-trend"></i>
                 </article>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-6 col-xl-3 reveal reveal-delay-4">
                 <article class="admin-stat-card">
-                    <div class="admin-stat-icon" style="--icon-bg: #eef0fb; --icon-color: #4355b9;">
+                    <div class="admin-stat-icon tours-icon">
                         <i class="bi bi-signpost-split"></i>
                     </div>
                     <div class="admin-stat-content">
@@ -92,9 +87,9 @@
                     <i class="bi bi-arrow-up-right admin-stat-trend"></i>
                 </article>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-6 col-xl-3 reveal reveal-delay-5">
                 <article class="admin-stat-card">
-                    <div class="admin-stat-icon" style="--icon-bg: #fef6e4; --icon-color: #b07d12;">
+                    <div class="admin-stat-icon reservations-icon">
                         <i class="bi bi-calendar-check"></i>
                     </div>
                     <div class="admin-stat-content">
@@ -106,7 +101,7 @@
             </div>
         </div>
 
-        <section id="section-languages" class="mb-5 reveal reveal-delay-2">
+        <section id="section-languages" class="mb-5 reveal reveal-delay-6">
             <div class="admin-section-header">
                 <div>
                     <p class="section-badge">Analytics</p>
@@ -117,18 +112,19 @@
             {% if p_reservations_by_lang %}
             <div class="admin-card">
                 <div class="admin-lang-grid">
-                    {% for row in p_reservations_by_lang %}
                     {% set max_res = p_reservations_by_lang | map(attribute=1) | max %}
+                    {% for row in p_reservations_by_lang %}
                     <div class="admin-lang-row">
-                        <div class="admin-lang-info">
+                        <div>
                             <span class="pills"><i class="bi bi-translate"></i> {{ row[0] }}</span>
                         </div>
-                        <div class="admin-lang-bar-wrap">
-                            <div class="admin-lang-bar" style="width: {{ ((row[1] / max_res) * 100) | round }}%"></div>
+                        <div class="admin-lang-bar-wrap" role="progressbar">
+                            <div class="admin-lang-bar"
+                                style="width: {{ ((row[1] / max_res) * 100) | round if max_res > 0 else 0 }}%"></div>
                         </div>
                         <div class="admin-lang-nums">
                             <span class="admin-lang-count">{{ row[1] }} bookings</span>
-                            <span class="admin-lang-people text-muted small">{{ row[2] or 0 }} people</span>
+                            <span class="text-muted small">{{ row[2] or 0 }} people</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -145,114 +141,331 @@
 
         <hr class="profile-divisor reveal reveal-delay-1">
 
-        <section id="section-users" class="mb-5 reveal reveal-delay-2">
-            <div class="admin-section-header">
+        <section id="section-guides" class="my-5">
+
+            <div class="admin-section-header reveal reveal-delay-2">
                 <div>
-                    <p class="section-badge">User management</p>
-                    <h2>Registered <span>users.</span></h2>
+                    <p class="section-badge">Guide directory</p>
+
+                    <h2>
+                        Guides and <span>their tours.</span>
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        All registered guides and the tours managed by each one.
+                    </p>
                 </div>
-                <span class="admin-count-badge">{{ p_users | length }} total</span>
+
+                <span class="admin-count-badge">
+                    {{ p_guides_data | length }}
+                    guide{% if p_guides_data | length != 1 %}s{% endif %}
+                </span>
             </div>
 
-            {% if p_users %}
-            <div class="admin-card p-0">
-                <div class="table-responsive">
-                    <table class="table admin-table mb-0">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Registered</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in p_users %}
-                            <tr>
-                                <td class="text-muted small">{{ user.id }}</td>
-                                <td><strong>{{ user.first_name }} {{ user.last_name }}</strong></td>
-                                <td class="small">{{ user.email }}</td>
-                                <td>
-                                    {% if user.role == 'guide' %}
-                                    <span class="admin-role-badge admin-role-guide">
-                                        <i class="bi bi-compass"></i> Guide
-                                    </span>
-                                    {% elif user.role == 'participant' %}
-                                    <span class="admin-role-badge admin-role-participant">
-                                        <i class="bi bi-backpack"></i> Participant
-                                    </span>
+            {% if p_guides_data %}
+
+            <div class="admin-guide-list">
+
+                {% for guide_data in p_guides_data %}
+
+                <article class="admin-guide-card reveal reveal-delay-1">
+
+                    <header class="admin-guide-header">
+
+                        <div class="admin-guide-person">
+
+                            {% if guide_data.guide.profile_img %}
+
+                            <img src="{{ url_for('static', filename=guide_data.guide.profile_img) }}"
+                                alt="{{ guide_data.guide.first_name }} {{ guide_data.guide.last_name }}"
+                                class="admin-guide-avatar-img">
+
+                            {% else %}
+
+                            <span class="admin-guide-avatar">
+                                {{ guide_data.guide.first_name[0] | upper }}
+                                {{ guide_data.guide.last_name[0] | upper }}
+                            </span>
+
+                            {% endif %}
+
+                            <div>
+                                <h3>
+                                    {{ guide_data.guide.first_name }}
+                                    {{ guide_data.guide.last_name }}
+                                </h3>
+
+                                <a href="mailto:{{ guide_data.guide.email }}" class="admin-guide-email">
+
+                                    <i class="bi bi-envelope"></i>
+                                    {{ guide_data.guide.email }}
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <div class="admin-guide-summary">
+
+                            <div class="admin-guide-languages">
+
+                                {% for language in guide_data.languages %}
+
+                                <span class="pills">
+                                    <i class="bi bi-translate"></i>
+                                    {{ language }}
+                                </span>
+
+                                {% else %}
+
+                                <span class="pills">
+                                    No languages specified
+                                </span>
+
+                                {% endfor %}
+
+                            </div>
+
+                            <span class="admin-tour-count">
+                                <strong>{{ guide_data.tours | length }}</strong>
+
+                                tour{% if guide_data.tours | length != 1 %}s{% endif %}
+                            </span>
+
+                        </div>
+
+                    </header>
+
+                    <div class="admin-guide-tours">
+
+                        {% if guide_data.tours %}
+
+                        {% for tour_data in guide_data.tours %}
+
+                        <details class="admin-guide-tour reveal reveal-delay-1">
+
+                            <summary class="admin-guide-tour-summary">
+
+                                <div class="admin-tour-cover">
+
+                                    {% if tour_data.images %}
+
+                                    <img src="{{ url_for(
+                                        'static',
+                                        filename=tour_data.images[0].path_img
+                                    ) }}" alt="{{ tour_data.tour.title }}">
+
                                     {% else %}
-                                    <span class="admin-role-badge admin-role-admin">
-                                        <i class="bi bi-shield-check"></i> Admin
+
+                                    <span>
+                                        <i class="bi bi-image"></i>
                                     </span>
+
                                     {% endif %}
-                                </td>
-                                <td class="small text-muted">{{ user.created_at[:10] if user.created_at else "—" }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <p class="text-muted">No users found.</p>
-            {% endif %}
-        </section>
 
-        <hr class="profile-divisor reveal reveal-delay-1">
+                                </div>
 
-        <section id="section-tours" class="mb-5 reveal reveal-delay-2">
-            <div class="admin-section-header">
-                <div>
-                    <p class="section-badge">Tour management</p>
-                    <h2>All <span>tours.</span></h2>
-                </div>
-                <span class="admin-count-badge">{{ p_tours | length }} total</span>
-            </div>
+                                <div class="admin-guide-tour-title">
 
-            {% if p_tours %}
-            <div class="admin-card p-0">
-                <div class="table-responsive">
-                    <table class="table admin-table mb-0">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Title</th>
-                                <th>Guide</th>
-                                <th>Language</th>
-                                <th>Duration</th>
-                                <th>Max</th>
-                                <th>Created</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for tour in p_tours %}
-                            <tr>
-                                <td class="text-muted small">{{ tour.id }}</td>
-                                <td><strong>{{ tour.title }}</strong></td>
-                                <td class="small">{{ tour.first_name }} {{ tour.last_name }}</td>
-                                <td><span class="pills"><i class="bi bi-translate"></i> {{ tour.language }}</span></td>
-                                <td>{{ tour.duration }} min</td>
-                                <td>{{ tour.max_participants }}</td>
-                                <td class="small text-muted">{{ tour.created_at[:10] if tour.created_at else "—" }}</td>
-                                <td>
-                                    <a href="{{ url_for('tour', tour_id=tour.id) }}" class="btn btn-sm btn-link-brand">
-                                        <i class="bi bi-eye"></i>
+                                    <span class="pills">
+                                        <i class="bi bi-translate"></i>
+                                        {{ tour_data.tour.language }}
+                                    </span>
+
+                                    <h4>{{ tour_data.tour.title }}</h4>
+
+                                    <div class="admin-tour-quick-info">
+
+                                        <span>
+                                            <i class="bi bi-clock"></i>
+                                            {{ tour_data.tour.duration }} min
+                                        </span>
+
+                                        <span>
+                                            <i class="bi bi-people"></i>
+                                            Max
+                                            {{ tour_data.tour.max_participants }}
+                                        </span>
+
+                                        <span>
+                                            <i class="bi bi-geo-alt"></i>
+                                            {{ tour_data.tour.meeting_point }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <i class="bi bi-chevron-down admin-tour-chevron"></i>
+
+                            </summary>
+
+                            <div class="admin-guide-tour-details">
+
+                                <section class="admin-tour-detail-block">
+
+                                    <p class="section-badge">
+                                        Description
+                                    </p>
+
+                                    <p>
+                                        {{ tour_data.tour.description }}
+                                    </p>
+
+                                </section>
+
+                                <div class="admin-tour-detail-grid">
+
+                                    <section class="admin-tour-detail-block">
+
+                                        <h5>
+                                            <i class="bi bi-calendar-week"></i>
+                                            Weekly schedule
+                                        </h5>
+
+                                        {% if tour_data.weekly_plan %}
+
+                                        <ul class="admin-detail-list">
+
+                                            {% for plan in tour_data.weekly_plan %}
+
+                                            <li>
+                                                <span>
+                                                    {{ p_days[
+                                                    plan.day_of_week
+                                                    ] }}
+                                                </span>
+
+                                                <strong>
+                                                    {{ plan.start_time }}
+                                                </strong>
+                                            </li>
+
+                                            {% endfor %}
+
+                                        </ul>
+
+                                        {% else %}
+
+                                        <p class="text-muted mb-0">
+                                            No weekly schedule.
+                                        </p>
+
+                                        {% endif %}
+
+                                    </section>
+
+                                    <section class="admin-tour-detail-block">
+
+                                        <h5>
+                                            <i class="bi bi-signpost-split"></i>
+                                            Tour stops
+                                        </h5>
+
+                                        {% if tour_data.stops %}
+
+                                        <ol class="admin-stop-list">
+
+                                            {% for stop in tour_data.stops %}
+
+                                            <li>
+                                                {{ stop.name }}
+                                            </li>
+
+                                            {% endfor %}
+
+                                        </ol>
+
+                                        {% else %}
+
+                                        <p class="text-muted mb-0">
+                                            No stops available.
+                                        </p>
+
+                                        {% endif %}
+
+                                    </section>
+
+                                </div>
+
+                                <section class="admin-tour-detail-block">
+
+                                    <h5>
+                                        <i class="bi bi-images"></i>
+                                        Promotional images
+                                    </h5>
+
+                                    <div class="admin-tour-images">
+
+                                        {% for image in tour_data.images %}
+
+                                        <img src="{{ url_for(
+                                            'static',
+                                            filename=image.path_img
+                                        ) }}" alt="{{ tour_data.tour.title }}
+                                            — image {{ loop.index }}">
+
+                                        {% else %}
+
+                                        <p class="text-muted mb-0">
+                                            No promotional images.
+                                        </p>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                </section>
+
+                                <div class="admin-tour-actions">
+
+                                    <a href="{{ url_for(
+                                        'tour',
+                                        tour_id=tour_data.tour.id
+                                    ) }}" class="btn btn-outline-brand colored">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        View complete tour
                                     </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <p class="text-muted">No tours found.</p>
-            {% endif %}
-        </section>
 
+                                </div>
+
+                            </div>
+
+                        </details>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="admin-guide-no-tours">
+                            <i class="bi bi-signpost"></i>
+
+                            <p>
+                                This guide has not created any tours yet.
+                            </p>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="no-found">
+                <i class="bi bi-person-x no-found-icon"></i>
+                <h3 class="fs-2 mb-2">No guides found</h3>
+                <p>No guide accounts have been registered yet.</p>
+            </div>
+
+            {% endif %}
+
+        </section>
     </main>
 </div>
 

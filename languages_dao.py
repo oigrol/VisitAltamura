@@ -33,18 +33,6 @@ def get_languages_by_guide(p_guide_id):
     conn.close()
 
     return [language['language'] for language in languages]
-
-def new_guide_language(p_guide_id, p_language):
-    query = "INSERT INTO guide_languages (guide_id, language) VALUES (?,?)"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_guide_id, p_language))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
     
 def count_guide_languages():
     query = "SELECT COUNT(DISTINCT language) FROM guide_languages"

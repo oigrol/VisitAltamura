@@ -6,13 +6,13 @@
 <section class="section login-section">
     <div class="container-xl">
         <div class="login-card">
-            <div class="login-title">
+            <div class="login-title reveal reveal-delay-1">
                 <p class="section-badge">Welcome back</p>
                 <h1>Login to your<br><span>VisitAltamura account.</span></h1>
                 <p>Enter your credentials to manage your tours or review your reservations.</p>
             </div>
 
-            <form class="form-card" method="post" action="{{ url_for('authenticate') }}">
+            <form class="form-card reveal reveal-delay-2" method="post" action="{{ url_for('authenticate') }}">
                 <div class="mb-3">
                     <label class="form-label" for="email">Email address</label>
                     <input class="form-control" id="email" name="email" type="email" required>

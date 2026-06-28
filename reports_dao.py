@@ -24,26 +24,7 @@ def new_report(p_tour_id, p_tour_date, p_final_participants, p_group_img):
     cursor = conn.cursor()
 
     cursor.execute(query, (p_tour_id, p_tour_date, p_final_participants, p_group_img))
-    tour_id = conn.execute("SELECT id FROM tour_final_reports WHERE tour_id = ? AND tour_date = ?", (p_tour_id, p_tour_date)).fetchone()[0]
 
     conn.commit()
     cursor.close()
     conn.close() 
-    return tour_id
-
-def get_reports_for_tour(p_tour_id):
-    query = "SELECT * FROM tour_final_reports WHERE tour_id = ? ORDER BY tour_date DESC"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query, (p_tour_id,))
-
-    db_reports = cursor.fetchall()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_reports

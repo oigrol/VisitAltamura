@@ -19,7 +19,6 @@
 
 html {
     scroll-behavior: smooth;
-    /* enables smooth scrolling for anchor links, enhancing user experience when navigating to different sections of the page */
 }
 
 body {
@@ -63,14 +62,11 @@ h2 span {
     color: var(--brand);
 }
 
-/*if not good, remove bg-effect and bg-effect-1, bg-effect-2 and their usage in base.html, they are just for a nice background effect, not essential for the website*/
 .bg-effect {
     position: fixed;
     z-index: -1;
-    /* must be behind everything */
     border-radius: 50%;
     filter: blur(90px);
-    /* effect: blur, they seem lights */
     opacity: 0.6;
 }
 
@@ -95,7 +91,13 @@ h2 span {
 .reveal {
     opacity: 0;
     transform: translateY(20px);
-    animation: revealAnimations 0.70s ease forwards;
+}
+
+.reveal.active {
+    animation-name: revealAnimations;
+    animation-duration: 0.70s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
 }
 
 @keyframes revealAnimations {
@@ -129,18 +131,17 @@ h2 span {
     animation-delay: 1.80s;
 }
 
+
 /* BASE PAGE */
 
 .header-site,
 .footer-site {
     background: var(--surface-glass);
     backdrop-filter: blur(15px);
-    /* adds a subtle blur effect to the background, enhancing the frosted glass look */
 }
 
 .header-site {
     position: sticky;
-    /* makes the header stick to the top of the viewport when scrolling */
     top: 0;
     z-index: 1000;
     border-bottom: 1px solid var(--line);
@@ -159,7 +160,6 @@ h2 span {
     display: block;
     height: 72px;
     object-fit: contain;
-    /* ensures the logo scales properly without distortion */
     width: auto;
 }
 
@@ -245,7 +245,6 @@ h2 span {
     color: var(--brand);
     font-weight: 700;
     text-decoration: none;
-    transition: color 0.2s ease;
     transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 
@@ -266,6 +265,8 @@ h2 span {
 
 .footer-text {
     color: var(--text-soft);
+    line-height: 1.55;
+    max-width: 310px;
 }
 
 .footer-logo {
@@ -273,11 +274,6 @@ h2 span {
     height: 82px;
     object-fit: contain;
     width: auto;
-}
-
-.footer-description {
-    line-height: 1.55;
-    max-width: 310px;
 }
 
 .footer-link {
@@ -321,7 +317,7 @@ h2 span {
 /* HOME PAGE */
 
 .hero-home {
-    background: linear-gradient(90deg, rgba(24, 34, 30, .94), rgba(24, 34, 30, .55) 58%, rgba(24, 34, 30, .22)), url('../images/tours/cathedral.webp') center/cover;
+    background: linear-gradient(90deg, rgba(24, 34, 30, .94), rgba(24, 34, 30, .55) 58%, rgba(24, 34, 30, .22)), url('../images/cathedral-hero.webp') center/cover;
     color: var(--text-white);
     min-height: 700px;
     overflow: hidden;
@@ -346,19 +342,23 @@ h2 span {
 }
 
 .pulse-delay-2 {
-    animation-delay: 0.3s;
+    animation-delay: 0.5s;
 }
 
 .pulse-delay-3 {
-    animation-delay: 0.6s;
+    animation-delay: 1s;
 }
 
 .pulse-delay-4 {
-    animation-delay: 0.9s;
+    animation-delay: 1.5s;
 }
 
 .pulse-delay-5 {
-    animation-delay: 1.2s;
+    animation-delay: 2s;
+}
+
+.pulse-delay-6 {
+    animation-delay: 2.5s;
 }
 
 @keyframes iconPulse {
@@ -830,13 +830,12 @@ h2 span {
     max-width: 700px;
 }
 
-/* SIGNUP-LOGIN PAGES */
-
 .form-card {
     background: var(--bg-soft);
     border: 1px solid var(--line);
-    border-radius: 22px;
+    border-radius: 0px;
     box-shadow: var(--shadow-small);
+    padding: 2.8rem;
 }
 
 .register-section,
@@ -853,12 +852,12 @@ h2 span {
     margin: 0 auto;
     max-width: 1040px;
     overflow: hidden;
-    border-radius: 22px;
+    border-radius: 20px;
 }
 
 .register-title,
 .login-title {
-    background: linear-gradient(145deg, rgba(38, 51, 47, 0.98), rgba(38, 51, 47, 0.84)), url('../images/tours/claustri.webp') center/cover;
+    background: linear-gradient(145deg, rgba(38, 51, 47, 0.98), rgba(38, 51, 47, 0.52)), url('../images/cathedral-altamura.webp') center/cover;
     color: var(--text-white);
     padding: 2.8rem;
 }
@@ -872,12 +871,6 @@ h2 span {
 .register-description {
     color: rgba(255, 255, 255, 0.82);
     margin-top: 1.2rem;
-}
-
-.form-card {
-    border-radius: 0;
-    box-shadow: none;
-    padding: 2.8rem;
 }
 
 .role-options {
@@ -1144,7 +1137,6 @@ h2 span {
 .tour-section-icon {
     display: grid;
     flex: 0 0 auto;
-    /* prevents the icon from shrinking or growing */
     align-items: center;
     justify-items: center;
     width: 2.8rem;
@@ -1452,20 +1444,26 @@ h2 span {
 
 /* PROFILE PAGE */
 
-.profile-section {
+.profile-section,
+.report-section,
+.reservation-section {
     min-height: 600px;
 }
 
-.profile-header {
+.profile-header,
+.reservation-header,
+.report-header {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: space-between;
     flex-wrap: wrap;
-    background: var(--bg-soft);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 2rem;
     border: 1px solid var(--line);
     border-radius: 22px;
+    background: var(--bg-soft);
     box-shadow: var(--shadow-small);
-    padding: 2rem;
 }
 
 .profile-avatar {
@@ -1496,7 +1494,8 @@ h2 span {
     min-width: 220px;
 }
 
-.profile-name {
+.profile-name,
+.report-name {
     font-family: var(--serif);
     font-size: 2.5rem;
     line-height: 1;
@@ -1510,7 +1509,8 @@ h2 span {
 }
 
 .stats-profile-card,
-.stats-reservation-card {
+.stats-reservation-card,
+.stats-report-card {
     display: flex;
     align-items: flex-start;
     gap: 0.8rem;
@@ -1523,7 +1523,8 @@ h2 span {
 }
 
 .stats-profile-card i,
-.stats-reservation-card i {
+.stats-reservation-card i,
+.stats-report-card i {
     flex-shrink: 0;
     padding-top: 0.15rem;
     color: var(--brand);
@@ -1531,14 +1532,16 @@ h2 span {
 }
 
 .stats-profile-content,
-.stats-reservation-content {
+.stats-reservation-content,
+.stats-report-content {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
 }
 
 .stats-profile-content span,
-.stats-reservation-content span {
+.stats-reservation-content span,
+.stats-report-content span {
     color: var(--text-soft);
     font-size: 0.68rem;
     font-weight: 700;
@@ -1548,14 +1551,16 @@ h2 span {
 }
 
 .stats-profile-content strong,
-.stats-reservation-content strong {
+.stats-reservation-content strong,
+.stats-report-content strong {
     color: var(--text);
     font-family: var(--serif);
     font-size: 2.4rem;
     line-height: 1;
 }
 
-.profile-tour-card {
+.profile-tour-card,
+.report-tour-card {
     background: var(--bg-soft);
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -1567,7 +1572,8 @@ h2 span {
     transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
-.profile-tour-card:hover {
+.profile-tour-card:hover,
+.report-tour-card:hover {
     box-shadow: 0 16px 36px rgba(38, 51, 47, 0.13);
     transform: translateY(-3px);
 }
@@ -1579,20 +1585,23 @@ h2 span {
     display: block;
 }
 
-.profile-tour-content {
+.profile-tour-content,
+.report-tour-content {
     padding: 1.2rem;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-.profile-tour-title {
+.profile-tour-title,
+.report-tour-title {
     font-family: var(--serif);
     font-size: 1.5rem;
     line-height: 1.1;
 }
 
-.profile-tour-info {
+.profile-tour-info,
+.report-tour-info {
     color: var(--text-soft);
     font-size: 0.84rem;
     margin-bottom: 1rem;
@@ -1602,7 +1611,8 @@ h2 span {
     gap: 0.55rem;
 }
 
-.profile-tour-guide {
+.profile-tour-guide,
+.report-tour-guide {
     color: var(--text-soft);
     font-size: 0.83rem;
     font-weight: 700;
@@ -1652,17 +1662,8 @@ h2 span {
     margin: 0;
 }
 
-.reservation-status {
+.reservation-card-heading .reservation-status {
     flex-shrink: 0;
-    padding: 0.4rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
 }
 
 .reservation-status-confirmed {
@@ -1680,11 +1681,13 @@ h2 span {
     color: #9c3131;
 }
 
-.reservation-pills {
+.reservation-pills,
+.report-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    margin-top: 0.9rem;
 }
 
 .reservation-details {
@@ -1908,25 +1911,14 @@ h2 span {
     margin-top: 0.2rem;
 }
 
-.reservation-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    padding: 2rem;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    background: var(--bg-soft);
-    box-shadow: var(--shadow-small);
+.reservation-header-content,
+.report-header-content {
+    flex: 1;
+    min-width: 0;
 }
 
-.reservation-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.9rem;
+.reservation-header-content .profile-name {
+    overflow-wrap: break-word;
 }
 
 .reservation-card {
@@ -2074,6 +2066,7 @@ h2 span {
     color: #ffffff;
     font-size: 0.73rem;
     font-weight: 800;
+    text-transform: uppercase;
 }
 
 .reservation-card-guests-info {
@@ -2143,22 +2136,6 @@ h2 span {
 .status-pending {
     background: var(--brand-soft);
     color: var(--brand-dark);
-}
-
-.reservations-empty-state {
-    padding: 2.5rem;
-}
-
-.completed-report-card {
-    position: relative;
-}
-
-.completed-report-image-wrapper {
-    position: relative;
-}
-
-.completed-report-image {
-    height: 220px;
 }
 
 .completed-report-heading {
@@ -2324,7 +2301,6 @@ h2 span {
     padding-top: 1rem;
 }
 
-/* ── Main content ── */
 .admin-main {
     flex: 1;
     padding: 3rem 2.5rem;
@@ -2347,16 +2323,6 @@ h2 span {
     margin: 0;
 }
 
-.admin-header-meta {
-    font-size: 0.85rem;
-    color: var(--text-soft);
-    background: var(--bg-deep);
-    padding: 0.4rem 0.9rem;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
-/* ── Stat cards ── */
 .admin-stat-card {
     background: var(--bg-soft);
     border: 1px solid var(--line);
@@ -2389,6 +2355,26 @@ h2 span {
     flex-shrink: 0;
 }
 
+.admin-stat-icon.guides-icon {
+    --icon-bg: var(--brand-soft);
+    --icon-color: var(--brand);
+}
+
+.admin-stat-icon.participants-icon {
+    --icon-bg: #e8f4f0;
+    --icon-color: #2d7d5e;
+}
+
+.admin-stat-icon.tours-icon {
+    --icon-bg: #eef0fb;
+    --icon-color: #4355b9;
+}
+
+.admin-stat-icon.reservations-icon {
+    --icon-bg: #fef6e4;
+    --icon-color: #b07d12;
+}
+
 .admin-stat-content {
     flex: 1;
     min-width: 0;
@@ -2418,7 +2404,6 @@ h2 span {
     opacity: 0.6;
 }
 
-/* ── Section header ── */
 .admin-section-header {
     display: flex;
     align-items: flex-end;
@@ -2438,7 +2423,6 @@ h2 span {
     letter-spacing: 0.04em;
 }
 
-/* ── Admin card wrapper ── */
 .admin-card {
     background: var(--bg-soft);
     border: 1px solid var(--line);
@@ -2448,11 +2432,6 @@ h2 span {
     padding: 1.5rem;
 }
 
-.admin-card.p-0 {
-    padding: 0;
-}
-
-/* ── Language analytics bar chart ── */
 .admin-lang-grid {
     display: flex;
     flex-direction: column;
@@ -2493,67 +2472,345 @@ h2 span {
     color: var(--text);
 }
 
-/* ── Admin table ── */
-.admin-table {
-    margin: 0;
-    font-size: 0.9rem;
+.admin-guide-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.admin-table thead th {
+.admin-guide-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow-small);
+    overflow: hidden;
+}
+
+.admin-guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem;
     background: var(--bg-deep);
-    color: var(--text-soft);
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--line);
-    border-top: none;
 }
 
-.admin-table tbody td {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
+.admin-guide-person {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.admin-table tbody tr:last-child td {
-    border-bottom: none;
+.admin-guide-avatar,
+.admin-guide-avatar-img {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 50%;
 }
 
-.admin-table tbody tr {
-    transition: background 0.15s;
+.admin-guide-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand);
+    color: white;
+    font-weight: 800;
 }
 
-.admin-table tbody tr:hover {
-    background: var(--bg-deep);
+.admin-guide-avatar-img {
+    object-fit: cover;
 }
 
-/* ── Role badges ── */
-.admin-role-badge {
+.admin-guide-person h3 {
+    margin: 0 0 0.25rem;
+    font-family: var(--serif);
+    font-size: 1.45rem;
+}
+
+.admin-guide-email {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.25rem 0.7rem;
-    border-radius: 20px;
-    font-size: 0.76rem;
-    font-weight: 600;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    text-decoration: none;
 }
 
-.admin-role-guide {
-    background: var(--brand-soft);
-    color: var(--brand-dark);
+.admin-guide-email:hover {
+    color: var(--brand);
 }
 
-.admin-role-participant {
-    background: #e8f4f0;
-    color: #2d7d5e;
+.admin-guide-summary {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.admin-role-admin {
-    background: #eef0fb;
-    color: #4355b9;
+.admin-guide-languages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
 }
+
+.admin-tour-count {
+    min-width: 75px;
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 0.75rem;
+}
+
+.admin-tour-count strong {
+    display: block;
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 1.7rem;
+    line-height: 1;
+}
+
+.admin-guide-tours {
+    padding: 1.25rem;
+}
+
+.admin-guide-tour {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.admin-guide-tour:not(:first-child) {
+    margin-top: 0.85rem;
+}
+
+.admin-guide-tour-summary {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.admin-guide-tour-summary:hover {
+    background: var(--bg-deep);
+}
+
+.admin-tour-cover {
+    width: 90px;
+    height: 72px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--bg-deep);
+}
+
+.admin-tour-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-tour-cover span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-soft);
+    font-size: 1.4rem;
+}
+
+.admin-guide-tour-title h4 {
+    margin: 0.45rem 0;
+    font-family: var(--serif);
+    font-size: 1.25rem;
+}
+
+.admin-tour-quick-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    color: var(--text-soft);
+    font-size: 0.78rem;
+}
+
+.admin-tour-quick-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.admin-tour-quick-info i {
+    color: var(--brand);
+}
+
+.admin-tour-chevron {
+    color: var(--brand);
+    transition: transform 0.2s ease;
+}
+
+.admin-guide-tour-details {
+    padding: 1.5rem;
+    background: var(--bg-deep);
+    border-top: 1px solid var(--line);
+}
+
+.admin-tour-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.admin-tour-detail-block {
+    padding: 1.1rem;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+}
+
+.admin-tour-detail-block h5 {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+    font-family: var(--serif);
+}
+
+.admin-tour-detail-block h5 i {
+    color: var(--brand);
+}
+
+.admin-detail-list,
+.admin-stop-list {
+    margin: 0;
+}
+
+.admin-detail-list {
+    padding: 0;
+    list-style: none;
+}
+
+.admin-detail-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.admin-detail-list li:last-child {
+    border-bottom: 0;
+}
+
+.admin-stop-list {
+    padding-left: 1.2rem;
+}
+
+.admin-stop-list li+li {
+    margin-top: 0.45rem;
+}
+
+.admin-tour-images {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.admin-tour-images img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.admin-tour-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.admin-guide-no-tours {
+    padding: 2rem;
+    color: var(--text-soft);
+    text-align: center;
+}
+
+.admin-guide-no-tours i {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--brand);
+    font-size: 2rem;
+}
+
+.admin-guide-no-tours p {
+    margin: 0;
+}
+
+.dark-mode {
+    --brand: #d97b55;
+    --brand-dark: #b85c38;
+    --brand-soft: rgba(184, 92, 56, 0.18);
+    --brand-soft-2: #e69b75;
+    --text: #e8e2d9;
+    --text-soft: #9e9890;
+    --text-white: #ffffff;
+    --text-soft-white: rgba(255, 255, 255, 0.75);
+    --bg: #1a1915;
+    --bg-deep: #1f1e1a;
+    --bg-soft: #242220;
+    --surface-glass: rgba(26, 25, 21, 0.75);
+    --line: rgba(232, 226, 217, 0.1);
+    --shadow-small: 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+
+
+.dark-mode .form-control,
+.dark-mode .form-select {
+    background-color: var(--bg-deep);
+    border-color: var(--line);
+    color: var(--text);
+}
+
+.dark-mode .form-control:focus,
+.dark-mode .form-select:focus {
+    background-color: var(--bg-soft);
+    color: var(--text);
+}
+
+.dark-mode .form-control::placeholder {
+    color: var(--text-soft);
+}
+
+.dark-mode .alert-danger {
+    background: #3d1d1d;
+    border-color: #7a2e2e;
+    color: #f1a0a0;
+}
+
+.dark-mode .alert-success {
+    background: #1a3328;
+    border-color: #2c6e49;
+    color: #7dd8a0;
+}
+
+.dark-mode .alert-warning {
+    background: #352a10;
+    border-color: #7a5c1a;
+    color: #f5cc70;
+}
+
+.dark-mode .alert-info {
+    background: #162535;
+    border-color: #1d4f7a;
+    color: #70baf5;
+}
+
+
+
 
 @media (max-width: 768px) {
 
@@ -2687,7 +2944,9 @@ h2 span {
         font-size: 1.8rem;
     }
 
-    .profile-header {
+    .profile-header,
+    .reservation-header,
+    .report-header {
         flex-direction: column;
         align-items: center;
         text-align: center;
@@ -2712,6 +2971,27 @@ h2 span {
 
     .reservation-card {
         grid-template-columns: auto 1fr auto;
+    }
+
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        position: static;
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .admin-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .admin-main {
+        padding: 1.5rem 1rem;
     }
 
 }

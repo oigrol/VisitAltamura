@@ -6,26 +6,28 @@
 
 {% block content %}
 
-<main class="pb-5">
+<div class="pb-5">
 
     <section class="pt-4 pb-3">
         <div class="container-xl">
-            <a class="tour-back" href="{{ url_for('home') }}#tours">
+            {% if current_user.role != 'guide' %}
+            <a class="tour-back reveal reveal-delay-1" href="{{ url_for('home') }}#tours">
                 <i class="bi bi-arrow-left"></i>
                 Back to tours
             </a>
+            {% endif %}
 
             <div class="row g-4 align-items-end">
 
                 <div class="col-lg-9">
-                    <p class="tour-detail">
+                    <p class="tour-detail reveal reveal-delay-2">
                         <i class="bi bi-geo-alt-fill icon"></i>
                         Free walking tour · Altamura
                     </p>
-                    <h1 class="tour-detail-title">
+                    <h1 class="tour-detail-title reveal reveal-delay-3">
                         {{ p_tour.title }}
                     </h1>
-                    <div class="tour-detail-info">
+                    <div class="tour-detail-info reveal reveal-delay-4">
                         <span>
                             <i class="bi bi-translate"></i>
                             {{ p_tour.language }}
@@ -42,7 +44,7 @@
                 </div>
 
                 <div class="col-lg-3">
-                    <div class="tour-guide">
+                    <div class="tour-guide reveal reveal-delay-5">
                         {% if p_guide.profile_img %}
                         <img class="tour-guide-avatar" src="{{ url_for('static', filename=p_guide.profile_img) }}"
                             alt="{{ p_guide.first_name }} {{ p_guide.last_name }}">
@@ -68,7 +70,7 @@
 
     <section class="pt-4">
         <div class="container-xl">
-            <div id="tourCarousel" class="carousel slide tour-carousel" data-bs-ride="carousel" data-bs-interval="3000">
+            <div id="tourCarousel" class="carousel slide tour-carousel reveal reveal-delay-6" data-bs-ride="carousel" data-bs-interval="3000">
                 <div class="carousel-indicators">
                     {% for path_img in p_images %}
                     <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="{{ loop.index0 }}"
@@ -111,8 +113,8 @@
         <div class="container-xl">
             <div class="row g-5">
                 <div class="col-lg-7">
-                    <section class="tour-info-card">
-                        <section class="tour-info-grid">
+                    <section class="tour-info-card reveal reveal-delay-1">
+                        <div class="tour-info-grid">
                             <div class="tour-info-item">
                                 <span class="tour-info-icon">
                                     <i class="bi bi-clock"></i>
@@ -160,10 +162,10 @@
                                     </p>
                                 </div>
                             </div>
-                        </section>
+                        </div>
                     </section>
 
-                    <section class="tour-section-wrapper">
+                    <section class="tour-section-wrapper reveal reveal-delay-2">
                         <div class="tour-section">
                             <div>
                                 <p class="tour-section-label"> The experience </p>
@@ -176,7 +178,7 @@
                         </div>
                     </section>
 
-                    <section class="tour-section-wrapper">
+                    <section class="tour-section-wrapper reveal reveal-delay-1">
                         <div class="tour-section">
                             <div>
                                 <p class="tour-section-label"> Planned departures </p>
@@ -195,7 +197,7 @@
                                     <span class="tour-plan-icon icon"></span>
                                     {{ p_days[plan.day_of_week] }}
                                 </span>
-                                <time>
+                                <time datetime="{{ plan.start_time }}">
                                     {{ plan.start_time }}
                                 </time>
                             </div>
@@ -212,7 +214,7 @@
                         {% endif %}
                     </section>
 
-                    <section class="tour-section-wrapper">
+                    <section class="tour-section-wrapper reveal reveal-delay-2">
                         <div class="tour-section">
                             <div>
                                 <p class="tour-section-label">
@@ -260,7 +262,7 @@
                         </div>
                     </section>
 
-                    <section class="tour-guide-card">
+                    <section class="tour-guide-card reveal reveal-delay-1">
                         {% if p_guide.profile_img %}
                         <img class="tour-guide-avatar large" src="{{ url_for('static', filename=p_guide.profile_img) }}"
                             alt="{{ p_guide.first_name }} {{ p_guide.last_name }}">
@@ -291,7 +293,7 @@
                 </div>
 
                 <div class="col-lg-5">
-                    <aside id="booking" class="tour-booking-card">
+                    <aside id="booking" class="tour-booking-card reveal reveal-delay-2">
 
                         <p class="tour-section-label">
                             Free walking tour
@@ -395,7 +397,7 @@
                         {% elif current_user.is_authenticated and current_user.role == 'guide' and current_user.id ==
                         p_tour.guide_id %}
                         <div class="d-grid gap-2 mt-4">
-                            <a href="{{ url_for('tour', tour_id=p_tour.id) }}" class="btn btn-brand">
+                            <a href="{{ url_for('tour_reservations', tour_id=p_tour.id) }}" class="btn btn-brand">
                                 <i class="bi bi-list-check me-1"></i>View reservations
                             </a>
                             <a href="{{ url_for('edit_tour', tour_id=p_tour.id) }}" class="btn btn-outline-brand colored">
@@ -444,6 +446,6 @@
             </div>
         </div>
     </section>
-</main>
+</div>
 
 {% endblock %}

@@ -10,7 +10,7 @@ Edit Tour — Visit Altamura
 
         <div class="form-page">
 
-            <div class="form-page-title">
+            <div class="form-page-title reveal reveal-delay-1">
                 <p class="section-badge">Edit tour</p>
 
                 <h1>
@@ -21,8 +21,9 @@ Edit Tour — Visit Altamura
                 {% if p_has_reservations %}
                 <p>
                     <i class="bi bi-lock me-1"></i>
-                    This tour has active reservations. You can only update
-                    its title and description.
+                    This tour has reservation history, including possible
+                    cancelled reservations. To preserve historical data,
+                    only the title and description can be changed.
                 </p>
                 {% else %}
                 <p>
@@ -32,7 +33,7 @@ Edit Tour — Visit Altamura
                 {% endif %}
             </div>
 
-            <form class="form-card tour-form" method="post" action="{{ url_for('update_tour', tour_id=p_tour.id) }}"
+            <form class="form-card tour-form reveal reveal-delay-2" method="post" action="{{ url_for('update_tour', tour_id=p_tour.id) }}"
                 enctype="multipart/form-data">
 
                 <fieldset class="tour-form-section is-first">
@@ -121,7 +122,6 @@ Edit Tour — Visit Altamura
                     </div>
                 </fieldset>
 
-                <!-- WEEKLY SCHEDULE -->
                 <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
 
                     <legend class="tour-form-legend">
@@ -169,7 +169,6 @@ Edit Tour — Visit Altamura
                     {% endfor %}
                 </fieldset>
 
-                <!-- ITINERARY STOPS -->
                 <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
 
                     <legend class="tour-form-legend">
@@ -196,27 +195,18 @@ Edit Tour — Visit Altamura
                             <input class="form-control" type="text" name="stops" value="{{ stop.name }}"
                                 placeholder="Stop name" required>
 
-                            {% if loop.index > 4 %}
-                            <button class="btn btn-sm btn-danger-soft" type="button" onclick="removeStop(this)"
-                                aria-label="Remove stop">
-
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                            {% endif %}
-
                         </div>
                         {% endfor %}
 
                     </div>
 
-                    <button class="btn btn-sm btn-outline-secondary mt-3" type="button" onclick="addStop()">
+                    <button class="btn btn-sm btn-outline-secondary mt-3" type="button" id="add-stop-button">
 
                         <i class="bi bi-plus-lg me-1"></i>
                         Add stop
                     </button>
                 </fieldset>
 
-                <!-- PHOTOS -->
                 <fieldset class="tour-form-section" {% if p_has_reservations %}disabled{% endif %}>
 
                     <legend class="tour-form-legend">
@@ -276,7 +266,6 @@ Edit Tour — Visit Altamura
                     </div>
                 </fieldset>
 
-                <!-- ACTIONS -->
                 <div class="d-flex gap-3 mt-4">
 
                     <button class="btn btn-brand" type="submit">
@@ -287,11 +276,8 @@ Edit Tour — Visit Altamura
                     <a class="btn btn-outline-secondary" href="{{ url_for('profile_guide') }}">
                         Cancel
                     </a>
-
                 </div>
-
             </form>
-
         </div>
     </div>
 </section>

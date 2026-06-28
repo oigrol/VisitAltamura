@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Report — {{ p_tour.title }} - Visit Altamura
+{% endblock %}
+
+{% block content %}
+<section class="section report-section">
+    <div class="container-xl">
+
+        <header class="report-header reveal reveal-delay-1">
+            <div class="report-header-content">
+                <p class="section-badge">Post-tour report</p>
+                <h1 class="report-name mb-4">{{ p_tour.title }}</h1>
+                <div class="report-pills">
+                    <span class="pills"><i class="bi bi-calendar-event"></i> {{ p_tour_date }}</span>
+                    <span class="pills"><i class="bi bi-clock"></i> {{ p_start_time or "—" }}</span>
+                    <span class="pills"><i class="bi bi-geo-alt"></i> {{ p_tour.meeting_point }}</span>
+                    <span class="pills"><i class="bi bi-people"></i> {{ p_expected_people }} expected</span>
+                </div>
+            </div>
+            <a href="{{ url_for('profile_guide') }}" class="btn btn-link-brand profile-btn">
+                <i class="bi bi-arrow-left me-1"></i>Back to profile
+            </a>
+        </header>
+
+        <div class="row g-4 mt-4">
+            <div class="col-12 col-lg-4 reveal reveal-delay-2">
+                <div class="form-page-title">
+                    <p class="section-badge mb-2">Complete your report</p>
+
+                    <h1>
+                        Declare tour<br>
+                        <span>results.</span>
+                    </h1>
+
+                    <p>
+                        {{ p_expected_people }} participant(s) had reserved a place for this date.
+                        Please declare how many actually showed up and upload a group photo as evidence.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-8">
+                <div class="report-tour-card reveal reveal-delay-3">
+                    <div class="report-tour-content">
+                        <h2 class="report-tour-title mb-3">Insert the tour results</h2>
+                        <form method="post"
+                            action="{{ url_for('submit_tour_report', tour_id=p_tour.id, tour_date=p_tour_date) }}"
+                            enctype="multipart/form-data">
+
+                            <div class="mb-4">
+                                <label class="form-label" for="final_participants">
+                                    Effective number of participants
+                                </label>
+                                <input class="form-control" type="number" id="final_participants"
+                                    name="final_participants_count" min="0" max="{{ p_expected_people }}"
+                                    placeholder="e.g. {{ p_expected_people }}" required>
+                                <div class="form-text">Enter the number of people who actually attended (0 – {{
+                                    p_expected_people }}).</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" for="group_img">
+                                    Group photo
+                                </label>
+
+                                <input class="form-control" type="file" id="group_img" name="group_img"
+                                    accept=".jpg,.jpeg,.png,.webp" required>
+                                <div class="form-text">Upload a photo showing the participants as proof that the tour
+                                    took place.</div>
+                            </div>
+
+                            <button class="btn btn-brand w-100" type="submit">
+                                <i class="bi bi-send me-1"></i>Submit report
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

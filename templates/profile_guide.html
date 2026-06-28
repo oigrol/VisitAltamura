@@ -29,13 +29,13 @@ My Profile - Visit Altamura
                     {% endfor %}
                 </div>
             </div>
-            <a href="{{ url_for('create_tour') }}" class="btn btn-brand profile-btn">
+            <a href="{{ url_for('new_tour') }}" class="btn btn-brand profile-btn">
                 <i class="bi bi-plus-lg me-1"></i>Create a tour
             </a>
         </header>
 
-        <div class="row g-3 mt-4 reveal reveal-delay-2">
-            <div class="col-12 col-md-4">
+        <div class="row g-3 mt-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-2">
                 <article class="stats-profile-card">
                     <i class="bi bi-signpost-split"></i>
                     <div class="stats-profile-content">
@@ -45,7 +45,7 @@ My Profile - Visit Altamura
                 </article>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-3">
                 <article class="stats-profile-card">
                     <i class="bi bi-people"></i>
                     <div class="stats-profile-content">
@@ -56,7 +56,7 @@ My Profile - Visit Altamura
                 </article>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-4">
                 <article class="stats-profile-card">
                     <i class="bi bi-calendar-week"></i>
                     <div class="stats-profile-content">
@@ -67,8 +67,8 @@ My Profile - Visit Altamura
             </div>
         </div>
 
-        <section class="mt-5 reveal reveal-delay-2">
-            <div class="section-title">
+        <section class="mt-5">
+            <div class="section-title reveal reveal-delay-1">
                 <div>
                     <p class="section-badge">Your tours</p>
                     <h2>Tours you <span>manage.</span></h2>
@@ -78,7 +78,7 @@ My Profile - Visit Altamura
             {% if p_tours_data %}
             <div class="row g-4">
                 {% for tour_data in p_tours_data %}
-                <article class="col-12 col-lg-6">
+                <article class="col-12 col-lg-6 reveal reveal-delay-{{ (loop.index0 % 2) + 2 }}">
                     <div class="profile-tour-card">
                         <img class="profile-tour-img" src="{{ url_for('static', filename=tour_data.tour.path_img) }}"
                             alt="{{ tour_data.tour.title }}">
@@ -110,10 +110,7 @@ My Profile - Visit Altamura
                                 <div><span><i class="bi bi-calendar-event me-2"></i>No upcoming occurrences.</span>
                                 </div>
                             </div>
-
-
                             {% endif %}
-
 
                             <div class="reservation-actions">
 
@@ -121,14 +118,14 @@ My Profile - Visit Altamura
                                     class="btn btn-sm btn-link-brand">
                                     <i class="bi bi-eye me-1"></i>View
                                 </a>
-                                <a href="{{ url_for('tour', tour_id=tour_data.tour.id) }}" class="btn btn-sm btn-brand">
+                                <a href="{{ url_for('tour_reservations', tour_id=tour_data.tour.id) }}" class="btn btn-sm btn-brand">
                                     <i class="bi bi-list-check me-1"></i>Reservations
                                 </a>
                                 <a href="{{ url_for('edit_tour', tour_id=tour_data.tour.id) }}"
                                     class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil me-1"></i>Edit
                                 </a>
-                                {% if not tour_data.has_reservations %}
+                                {% if not tour_data.has_any_reservations %}
                                 <form method="post" action="{{ url_for('delete_tour', tour_id=tour_data.tour.id) }}"
                                     class="cancellation delete-form" data-title="{{ tour_data.tour.title }}">
                                     <button class="btn btn-sm" type="submit">
@@ -138,7 +135,7 @@ My Profile - Visit Altamura
                                 </form>
                                 {% else %}
                                 <span class="cancellation text-cancellation btn-blocked"
-                                    title="This tour has reservations and cannot be deleted.">
+                                    title="This tour has reservation history and cannot be deleted.">
                                     <i class="bi bi-lock"></i> Delete unavailable
                                 </span>
                                 {% endif %}
@@ -149,133 +146,12 @@ My Profile - Visit Altamura
                 {% endfor %}
             </div>
             {% else %}
-            <div class="no-found">
+            <div class="no-found reveal reveal-delay-2">
                 <i class="bi bi-map no-found-icon"></i>
                 <h3 class="fs-2 mb-2">No tours yet</h3>
                 <p class="mb-3">Create your first tour and start sharing your Altamura with visitors.</p>
-                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
+                <a class="btn btn-brand" href="{{ url_for('new_tour') }}">
                     <i class="bi bi-plus-lg me-1"></i>Create your first tour
-                </a>
-            </div>
-            {% endif %}
-        </section>
-
-        <hr class="profile-divisor reveal reveal-delay-3">
-
-        <section class="mt-5 reveal reveal-delay-4">
-            <div class="section-title">
-                <div>
-                    <p class="section-badge">Your reports</p>
-                    <h2>Reports to <span>complete.</span></h2>
-                </div>
-            </div>
-
-            {% if p_missing_reports %}
-            <div class="row g-4">
-                {% for report in p_missing_reports %}
-                <article class="col-12 col-lg-6">
-                    <div class="profile-tour-card">
-                        <img class="profile-tour-img" src="{{ url_for('static', filename=report.tour.path_img) }}"
-                            alt="{{ report.tour.title }}">
-
-                        <div class="profile-tour-content">
-                            <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                                <h3 class="profile-tour-title">{{ report.tour.title }}</h3>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-translate"></i> {{ report.tour.language }}
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-people"></i> {{ report.tour.expected_people }} expected
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-calendar"></i> {{ report.tour_date }}
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-clock"></i> {{ report.start_time or "-" }}
-                                </span>
-                            </div>
-                            <p class="profile-tour-info">
-                                <i class="bi bi-clock"></i> {{ report.tour.duration }} min
-                            </p>
-
-                            <div class="d-flex flex-wrap gap-2 mt-3">
-                                <a href="{{ url_for('report', tour_id=report.tour.id, tour_date=report.tour_date) }}"
-                                    class="btn btn-sm btn-brand">
-                                    <i class="bi bi-pencil me-1"></i>Complete report
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-found">
-                <i class="bi bi-clipboard-check no-found-icon"></i>
-                <h3 class="fs-2 mb-2">No reports to complete</h3>
-                <p class="mb-3">You have no pending reports. Great job!</p>
-                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
-                    <i class="bi bi-map me-1"></i>Create a tour
-                </a>
-            </div>
-            {% endif %}
-        </section>
-
-        <hr class="profile-divisor reveal reveal-delay-5">
-
-        <section class="mt-5 reveal reveal-delay-6">
-            <div class="section-title">
-                <div>
-                    <p class="section-badge">Completed reports</p>
-                    <h2>Reported <span>tours.</span></h2>
-                </div>
-            </div>
-
-            {% if p_completed_reports %}
-            <div class="row g-4">
-                {% for report in p_completed_reports %}
-                <article class="col-12 col-lg-6">
-                    <div class="profile-tour-card">
-                        <img class="profile-tour-img" src="{{ url_for('static', filename=report.tour.path_img) }}"
-                            alt="{{ report.tour.title }}">
-
-                        <div class="profile-tour-content">
-                            <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                                <h3 class="profile-tour-title">{{ report.tour.title }}</h3>
-                                <span class="pills flex shrink-0">
-                                    <i class="bi bi-translate"></i> {{ report.tour.language }}
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-people"></i> {{ report.tour.expected_people }} expected
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-calendar"></i> {{ report.tour_date }}
-                                </span>
-                                <span class="pills flex-shrink-0">
-                                    <i class="bi bi-clock"></i> {{ report.start_time or "-" }}
-                                </span>
-                            </div>
-                            <p class="profile-tour-info">
-                                <i class="bi bi-clock"></i> {{ report.tour.duration }} min
-                            </p>
-                            <div class="d-flex flex-wrap gap-2 mt-3">
-                                <a href="{{ url_for('view_report', tour_id=report.tour.id, tour_date=report.tour_date) }}"
-                                    class="btn btn-sm btn-brand">
-                                    <i class="bi bi-eye me-1"></i>View report
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-found">
-                <i class="bi bi-clipboard-check no-found-icon"></i>
-                <h3 class="fs-2 mb-2">No completed reports</h3>
-                <p class="mb-3">You have no completed reports yet.</p>
-                <a class="btn btn-brand" href="{{ url_for('create_tour') }}">
-                    <i class="bi bi-map me-1"></i>Create a tour
                 </a>
             </div>
             {% endif %}

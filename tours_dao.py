@@ -171,10 +171,24 @@ def has_reservations(p_tour_id):
     cursor.close()
     conn.close()
 
-    if count > 0:
-        return True
-    
-    return False
+    return count > 0
+
+def has_confirmed_reservations(p_tour_id):
+    # Check if a tour has any confirmed reservations
+    query = "SELECT COUNT(*) FROM reservations WHERE tour_id = ? AND status = 'confirmed'"
+
+    conn = sqlite3.connect("VisitAltamura_db.db")
+    cursor = conn.cursor()
+
+    cursor.execute(query, (p_tour_id,))
+
+    count = cursor.fetchone()[0]
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return count > 0
 
 def update_tour(p_tour_id, p_title, p_description, p_duration, p_language, p_meeting_point, p_max_participants, p_weekly_plan, p_stops, p_images):
     query = "UPDATE tours SET title = ?, description = ?, duration = ?, language = ?, meeting_point = ?, max_participants = ? WHERE id = ?"
@@ -227,7 +241,7 @@ def delete_tour(p_tour_id):
     query_weekly_plan = "DELETE FROM tour_weekly_plan WHERE tour_id = ?"
     query_stops = "DELETE FROM tour_stops WHERE tour_id = ?"
     query_images = "DELETE FROM tour_images WHERE tour_id = ?"
-    #query_reports = "DELETE FROM tour_final_reports WHERE tour_id = ?"
+    query_reports = "DELETE FROM tour_final_reports WHERE tour_id = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
     cursor = conn.cursor()
@@ -235,8 +249,7 @@ def delete_tour(p_tour_id):
     cursor.execute(query_images, (p_tour_id,))
     cursor.execute(query_stops, (p_tour_id,))
     cursor.execute(query_weekly_plan, (p_tour_id,))
-    #eventuali reports associati al tour devono essere eliminati prima di eliminare il tour stesso
-    #cursor.execute(query_reports, (p_tour_id,))
+    cursor.execute(query_reports, (p_tour_id,))
     cursor.execute(query, (p_tour_id,))
 
     conn.commit()

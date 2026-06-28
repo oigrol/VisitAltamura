@@ -4,12 +4,12 @@ const guideRole = document.querySelector('#role-guide');
 const languagesContainer = document.querySelector('#guide-languages');
 
 if (participantRole && guideRole && languagesContainer) {
-    participantRole.addEventListener('change', function () { //when the participant role is selected, hide the languages container
+    participantRole.addEventListener('change', function () {
         languagesContainer.classList.remove('show');
         languagesContainer.classList.add('hidden');
     });
 
-    guideRole.addEventListener('change', function () { //when the guide role is selected, show the languages container
+    guideRole.addEventListener('change', function () {
         languagesContainer.classList.remove('hidden');
         languagesContainer.classList.add('show');
     });
@@ -23,7 +23,7 @@ const guestFields = document.querySelector('#guest-fields');
 if (guestSelect && guestFields) {
     guestSelect.addEventListener('change', function () {
         const numberOfGuests = parseInt(this.value);
-        guestFields.innerHTML = ''; // Clear previous fields
+        guestFields.innerHTML = '';
         for (let i = 1; i <= numberOfGuests; i++) {
             const guestField = document.createElement('div');
             guestField.classList.add('row', 'g-3', 'mb-3');
@@ -73,6 +73,7 @@ for (const form of deleteForms) {
 }
 
 
+// smooth scrolling and active link highlighting
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', event => {
         document.querySelectorAll('.nav-link').forEach(navLink => {
@@ -83,7 +84,6 @@ document.querySelectorAll('.nav-link').forEach(link => {
 
         const href = link.getAttribute('href');
 
-        // Scorrimento fluido solo per i link interni alla pagina
         if (href && href.startsWith('#')) {
             event.preventDefault();
 
@@ -98,3 +98,57 @@ document.querySelectorAll('.nav-link').forEach(link => {
         }
     });
 });
+
+
+// dark mode toggle
+const btnTheme = document.querySelector('#btn-theme');
+if (btnTheme) {
+    // Ripristina preferenza salvata
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        btnTheme.querySelector('i').className = 'bi bi-sun';
+    }
+    btnTheme.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        btnTheme.querySelector('i').className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+}
+
+
+const revealElements = document.querySelectorAll('.reveal');
+
+if (revealElements.length > 0) {
+
+    function showElement(entries, observer) {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        }
+    }
+
+    const revealObserver = new IntersectionObserver(showElement, {
+        threshold: 0.2,
+    });
+
+    const revealSectionTitleObserver = new IntersectionObserver(showElement, {
+        threshold: 0.2,
+        rootMargin: '0px 0px -50% 0px'
+    });
+
+    for (const element of revealElements) {
+        const isSectionTitle = element.matches(
+            '.profile-section .container-xl > section > .section-title:first-child, ' +
+            '.reservation-section .container-xl > section > .section-title:first-child'
+        );
+
+        if (isSectionTitle) {
+            revealSectionTitleObserver.observe(element);
+        } else {
+            revealObserver.observe(element);
+        }
+    }
+}

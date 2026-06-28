@@ -29,8 +29,8 @@ My Profile - Visit Altamura
             </a>
         </header>
 
-        <div class="row g-3 mt-4 reveal reveal-delay-2">
-            <div class="col-12 col-md-4">
+        <div class="row g-3 mt-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-2">
                 <article class="stats-profile-card">
                     <i class="bi bi-calendar-event"></i>
                     <div class="stats-profile-content">
@@ -40,7 +40,7 @@ My Profile - Visit Altamura
                 </article>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-3">
                 <article class="stats-profile-card">
                     <i class="bi bi-people"></i>
                     <div class="stats-profile-content">
@@ -50,7 +50,7 @@ My Profile - Visit Altamura
                 </article>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 reveal reveal-delay-4">
                 <article class="stats-profile-card">
                     <i class="bi bi-check2-circle"></i>
                     <div class="stats-profile-content">
@@ -61,8 +61,8 @@ My Profile - Visit Altamura
             </div>
         </div>
 
-        <section class="mt-5 reveal reveal-delay-2">
-            <div class="section-title">
+        <section class="mt-5">
+            <div class="section-title reveal reveal-delay-1">
                 <div>
                     <p class="section-badge"> Your reservations </p>
                     <h2> Upcoming <span>experiences.</span> </h2>
@@ -72,8 +72,8 @@ My Profile - Visit Altamura
             {% if p_upcoming_reservations %}
             <div class="row g-4">
                 {% for reservation_data in p_upcoming_reservations %}
-                <div class="col-12 col-lg-6">
-                    <article class="profile-tour-card">
+                <article class="col-12 col-lg-6 reveal reveal-delay-{{ (loop.index0 % 2) + 2 }}">
+                    <div class="profile-tour-card">
                         <img class="profile-tour-img"
                             src="{{ url_for( 'static', filename=reservation_data.reservation.path_img ) }}"
                             alt="{{ reservation_data.reservation.tour_title }}">
@@ -104,14 +104,16 @@ My Profile - Visit Altamura
                             </div>
 
                             <div class="reservation-details">
-                                <div class="reservation-detail"> <i class="bi bi-geo-alt-fill reservation-detail-icon"></i>
+                                <div class="reservation-detail"> <i
+                                        class="bi bi-geo-alt-fill reservation-detail-icon"></i>
                                     <div> <span>Meeting point</span> <strong> {{
                                             reservation_data.reservation.meeting_point }}
                                         </strong>
                                     </div>
                                 </div>
 
-                                <div class="reservation-detail"> <i class="bi bi-people-fill reservation-detail-icon"></i>
+                                <div class="reservation-detail"> <i
+                                        class="bi bi-people-fill reservation-detail-icon"></i>
                                     <div>
                                         <span>Reservation for</span>
                                         <strong> {{ reservation_data.reservation.people_count }}
@@ -145,7 +147,8 @@ My Profile - Visit Altamura
                                 {% if reservation_data.cancellable %}
                                 <form method="post"
                                     action="{{ url_for('cancel_reservation', reservation_id=reservation_data.reservation.id) }}"
-                                    class="cancellation delete-form" data-title="{{ reservation_data.reservation.tour_title }}">
+                                    class="cancellation delete-form"
+                                    data-title="{{ reservation_data.reservation.tour_title }}">
                                     <button class="btn btn-sm cancellation" type="submit">
                                         <i class="bi bi-trash me-1"></i>
                                         Cancel reservation
@@ -156,13 +159,14 @@ My Profile - Visit Altamura
                                 {% endif %}
                             </div>
                         </div>
-                    </article>
-                </div>
+                    </div>
+                </article>
                 {% endfor %}
             </div>
 
             {% else %}
-            <div class="no-found"> <i class="bi bi-calendar2 no-found-icon"></i>
+            <div class="no-found reveal reveal-delay-2">
+                <i class="bi bi-calendar2 no-found-icon"></i>
                 <h3 class="fs-2 mb-2"> No upcoming tours </h3>
                 <p class="mb-3"> Explore the available tours and reserve your next free walking tour in Altamura. </p>
                 <a class="btn btn-brand" href="{{ url_for('home') }}#tours"> <i class="bi bi-compass"></i>
@@ -173,8 +177,8 @@ My Profile - Visit Altamura
 
         <hr class="profile-divisor reveal reveal-delay-3">
 
-        <section class="mt-5 reveal reveal-delay-4">
-            <div class="section-title">
+        <section class="mt-5">
+            <div class="section-title reveal reveal-delay-1">
                 <div>
                     <p class="section-badge"> Your history </p>
                     <h2> Previous <span>reservations.</span> </h2>
@@ -184,8 +188,8 @@ My Profile - Visit Altamura
             {% if p_reservation_history %}
             <div class="row g-4">
                 {% for reservation_data in p_reservation_history %}
-                <div class="col-12 col-lg-6">
-                    <article class="profile-tour-card">
+                <article class="col-12 col-lg-6 reveal reveal-delay-{{ (loop.index0 % 2) + 2 }}">
+                    <div class="profile-tour-card">
                         <img class="profile-tour-img"
                             src="{{ url_for( 'static', filename=reservation_data.reservation.path_img ) }}"
                             alt="{{ reservation_data.reservation.tour_title }}">
@@ -221,14 +225,16 @@ My Profile - Visit Altamura
                             </div>
 
                             <div class="reservation-details">
-                                <div class="reservation-detail"> <i class="bi bi-geo-alt-fill reservation-detail-icon"></i>
+                                <div class="reservation-detail"> <i
+                                        class="bi bi-geo-alt-fill reservation-detail-icon"></i>
                                     <div> <span>Meeting point</span> <strong> {{
                                             reservation_data.reservation.meeting_point }}
                                         </strong>
                                     </div>
                                 </div>
 
-                                <div class="reservation-detail"> <i class="bi bi-people-fill reservation-detail-icon"></i>
+                                <div class="reservation-detail"> <i
+                                        class="bi bi-people-fill reservation-detail-icon"></i>
                                     <div>
                                         <span>Reservation for</span>
                                         <strong> {{ reservation_data.reservation.people_count }}
@@ -260,12 +266,12 @@ My Profile - Visit Altamura
                                     class="btn btn-sm btn-link-brand"> <i class="bi bi-eye me-1"></i> View tour </a>
                             </div>
                         </div>
-                    </article>
-                </div>
+                    </div>
+                </article>
                 {% endfor %}
             </div>
             {% else %}
-            <div class="no-found">
+            <div class="no-found reveal reveal-delay-2">
                 <i class="bi bi-clock-history no-found-icon"></i>
                 <h3 class="fs-2 mb-2"> No previous reservations </h3>
                 <p class="mb-3"> Your completed and cancelled reservations will appear here. </p>

@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import email
 import time
 
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -8,11 +9,12 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import User
-import languages_dao, reservations_dao, users_dao, tours_dao, reports_dao, admin_dao
+import languages_dao, reservations_dao, users_dao, tours_dao, reports_dao
 
 LANGUAGES = ['Italian', 'English', 'Spanish', 'Portuguese', 'German']
 DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+MONTHS = ['','Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 app = Flask(__name__)
 
@@ -20,6 +22,9 @@ app.config["SECRET_KEY"] = "Key for VisitAltamura"
 
 login_manager = LoginManager() 
 login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message = "Please log in to access this page."
+login_manager.login_message_category = "warning"
 
 def get_upcoming_dates(p_weekly_plan):
     upcoming_dates = []
@@ -50,6 +55,19 @@ def get_upcoming_dates(p_weekly_plan):
 
     return upcoming_dates
 
+def is_allowed_image(p_filename):
+    filename = secure_filename(p_filename)
+    if not filename or '.' not in filename:
+        return False
+    extension = filename.rsplit('.', 1)[1].lower()
+    return extension in ALLOWED_IMAGE_EXTENSIONS
+
+def is_allowed_time(p_time):
+    try:
+        datetime.strptime(p_time, "%H:%M")
+        return True
+    except ValueError:
+        return False
 
 @app.route('/')
 def home():
@@ -61,10 +79,14 @@ def home():
     filter_duration = request.args.get('duration', '').strip()
 
     if filter_date:
-        filter_date = date.fromisoformat(filter_date) #converte la stringa in oggetto date
-        if filter_date < date.today():
-            flash("Please do not choose a past date.", "danger")
+        try:
+            filter_date = date.fromisoformat(filter_date)
+            if filter_date < date.today():
+                flash("Please do not choose a past date.", "danger")
+                filter_date = ''
+        except ValueError:
             filter_date = ''
+
 
     if filter_language not in LANGUAGES:
         filter_language = ''
@@ -96,7 +118,6 @@ def home():
 
 @app.route("/tours/<int:tour_id>")
 def tour(tour_id):
-    today = date.today().isoformat()
     
     db_tour = tours_dao.get_tour_by_id(tour_id)
     if not db_tour:
@@ -105,7 +126,7 @@ def tour(tour_id):
     
     db_stops = tours_dao.get_tour_stops(tour_id)
     db_weekly_plan = tours_dao.get_tour_weekly_plan(tour_id)
-    db_has_reservations = tours_dao.has_reservations(tour_id)
+    db_has_reservations = tours_dao.has_confirmed_reservations(tour_id)
 
     guide_id = db_tour['guide_id']
     db_guide = users_dao.get_user_by_id(guide_id)
@@ -121,12 +142,11 @@ def tour(tour_id):
     if current_user.is_authenticated and current_user.role == 'participant':
         upcoming_dates = get_upcoming_dates(db_weekly_plan)
 
-    return render_template("tour.html", p_tour=db_tour, p_images=images, p_stops=db_stops, p_weekly_plan=db_weekly_plan, p_has_reservations=db_has_reservations, p_upcoming_dates=upcoming_dates, p_guide=db_guide, p_days=DAYS, p_today=today)
+    return render_template("tour.html", p_tour=db_tour, p_images=images, p_stops=db_stops, p_weekly_plan=db_weekly_plan, p_has_reservations=db_has_reservations, p_upcoming_dates=upcoming_dates, p_guide=db_guide, p_days=DAYS)
 
 @app.route("/tours/new_tour")
 @login_required
 def new_tour():
-
     user = current_user
 
     if user.role != 'guide':
@@ -156,8 +176,17 @@ def create_tour():
         flash("Please complete all the required fields", "danger")
         return redirect(url_for("new_tour"))
     
-    duration = int(duration)
-    max_participants = int(max_participants)
+    if len(title) > 120 or len(meeting_point) > 200:
+        flash("Title cannot exceed 120 characters and meeting point cannot exceed 200 characters.", "danger")
+        return redirect(url_for("new_tour"))
+
+    try:
+        duration = int(duration)
+        max_participants = int(max_participants)
+    except ValueError:
+        flash("Duration and max participants must be valid numbers.", "danger")
+        return redirect(url_for("new_tour"))
+
     if duration <= 0 or max_participants <= 0:
         flash("Duration and max participants must be positive numbers", "danger")
         return redirect(url_for("new_tour"))
@@ -174,7 +203,7 @@ def create_tour():
         start_time = request.form.get(f"start_time_{i}", "").strip()
         if not day_enabled:
             continue
-        if not start_time:
+        if not start_time or not is_allowed_time(start_time):
             flash(f"Please select a start time for {day}", "danger")
             return redirect(url_for("new_tour"))
         weekly_plan.append({
@@ -205,18 +234,20 @@ def create_tour():
     if len(valid_images) != 5:
         flash("Please upload exactly 5 images for the tour", "danger")
         return redirect(url_for("new_tour"))
+    if not all(is_allowed_image(image.filename) for image in valid_images):
+        flash("Invalid image format. Allowed formats: png, jpg, jpeg, webp", "danger")
+        return redirect(url_for("new_tour"))
 
     image_paths = []
     for position, image in enumerate(valid_images, start=1):
-        if image and image.filename != '':
-            filename_old = secure_filename(image.filename)
-            filename_new = f"{int(time.time())}_{filename_old}"
-            img_path = "images/tours/" + filename_new
-            image.save("static/" + img_path)
-            image_paths.append({
-                "position": position,
-                "path_img": img_path
-            })
+        filename_old = secure_filename(image.filename)
+        filename_new = f"{int(time.time())}_{filename_old}"
+        img_path = "images/tours/" + filename_new
+        image.save("static/" + img_path)
+        image_paths.append({
+            "position": position,
+            "path_img": img_path
+        })
 
     tours_dao.new_tour(title, description, guide_id, duration, language, meeting_point, max_participants, weekly_plan, stops, image_paths)
     flash("Tour created successfully!", "success")
@@ -263,7 +294,7 @@ def update_tour(tour_id):
     if not title or not description:
         flash("Please complete all the required fields", "danger")
         return redirect(url_for("edit_tour", tour_id=tour_id))
-
+    
     db_has_reservation = tours_dao.has_reservations(tour_id)
     if db_has_reservation:
         tours_dao.update_tour_with_reservations(tour_id, title, description)
@@ -280,8 +311,17 @@ def update_tour(tour_id):
         flash("Please complete all the required fields", "danger")
         return redirect(url_for("edit_tour", tour_id=tour_id))
     
-    duration = int(duration)
-    max_participants = int(max_participants)
+    if len(title) > 120 or len(meeting_point) > 200:
+        flash("Title cannot exceed 120 characters and meeting point cannot exceed 200 characters.", "danger")
+        return redirect(url_for("new_tour"))
+    
+    try:
+        duration = int(duration)
+        max_participants = int(max_participants)
+    except ValueError:
+        flash("Duration and max participants must be valid numbers.", "danger")
+        return redirect(url_for("edit_tour", tour_id=tour_id))
+    
     if duration <= 0 or max_participants <= 0:
         flash("Duration and max participants must be positive numbers", "danger")
         return redirect(url_for("edit_tour", tour_id=tour_id))
@@ -298,7 +338,7 @@ def update_tour(tour_id):
         start_time = request.form.get(f"start_time_{i}", "").strip()
         if not day_enabled:
             continue
-        if not start_time:
+        if not start_time or not is_allowed_time(start_time):
             flash(f"Please select a start time for {day}", "danger")
             return redirect(url_for("edit_tour", tour_id=tour_id))
         weekly_plan.append({
@@ -331,6 +371,10 @@ def update_tour(tour_id):
         if image is None or not image.filename:
             continue
 
+        if not is_allowed_image(image.filename):
+            flash(f"Invalid image format for image {position}. Allowed formats: png, jpg, jpeg, webp", "danger")
+            return redirect(url_for("edit_tour", tour_id=tour_id))
+
         filename_old = secure_filename(image.filename)
         filename_new = f"{int(time.time())}_{filename_old}"
         img_path = "images/tours/" + filename_new
@@ -359,7 +403,7 @@ def delete_tour(tour_id):
         return redirect(url_for("profile_guide"))
     
     if tours_dao.has_reservations(tour_id):
-        flash("Cannot delete a tour that has reservations", "danger")
+        flash("Cannot delete a tour that has reservation history, including possible cancelled reservations.", "danger")
         return redirect(url_for("edit_tour", tour_id=tour_id))
     
     tours_dao.delete_tour(tour_id)
@@ -388,12 +432,22 @@ def reserve_tour(tour_id):
         flash("Please select a date and number of guests", "danger")
         return redirect(url_for("tour", tour_id=tour_id))
     
-    tour_date = date.fromisoformat(tour_date_str)
+    try:
+        tour_date = date.fromisoformat(tour_date_str)
+    except ValueError:
+        flash("Invalid date.", "danger")
+        return redirect(url_for("tour", tour_id=tour_id))
+    
     if tour_date < date.today():
         flash("Please select a future date.", "danger")
         return redirect(url_for("tour", tour_id=tour_id))
 
-    guests = int(guests)
+    try:
+        guests = int(guests)
+    except ValueError:
+        flash("Guests must be valid numbers.", "danger")
+        return redirect(url_for("tour", tour_id=tour_id))
+    
     if guests < 0 or guests > 3:
         flash("Number of guests must be between 0 and 3", "danger")
         return redirect(url_for("tour", tour_id=tour_id))
@@ -452,14 +506,11 @@ def reserve_tour(tour_id):
             "last_name": guest_last_name
         })
     
-    reservation_id = reservations_dao.new_reservation(user.id, tour_id, tour_date_str, people_count, "confirmed")
+    reservation_id = reservations_dao.new_reservation(user.id, tour_id, tour_date_str, people_count, "confirmed", guests_full_names)
 
     if not reservation_id:
         flash("Error creating reservation", "danger")
         return redirect(url_for("tour", tour_id=tour_id))
-
-    for guest in guests_full_names:
-        reservations_dao.add_guest_to_reservation(reservation_id, guest['first_name'], guest['last_name'])
 
     flash("Reservation successful!", "success")
     return redirect(url_for("profile_participant"))
@@ -517,12 +568,14 @@ def tour_reservations(tour_id):
         flash("Tour not found or you do not have permission to view reservations for this tour", "danger")
         return redirect(url_for("profile_guide"))
 
-    reservation_dates = reservations_dao.get_dates_with_confirmed_reservations_for_tour(tour_id)
+    reservation_dates = reservations_dao.get_dates_with_confirmed_reservations(tour_id)
+    cancelled_reservation_dates = reservations_dao.get_dates_with_cancelled_reservations(tour_id)
     current_datetime = datetime.now()
 
     upcoming_reservations = []
     pending_reports_reservations = []
     completed_reports_reservations = []
+    cancelled_reservations = []
 
     for reservation_date in reservation_dates:
         reservation_tour_in_date = reservations_dao.get_reservations_for_tour_date(tour_id, reservation_date['tour_date'])
@@ -557,14 +610,29 @@ def tour_reservations(tour_id):
             upcoming_reservations.append(reservation_info)
 
     completed_reports_reservations.reverse()
+        
+    for reservation_date in cancelled_reservation_dates:
+        reservation_tour_in_date = reservations_dao.get_cancelled_reservations_for_tour_date(tour_id, reservation_date['tour_date'])
+        guests_per_reservation = {}
+        for reservation in reservation_tour_in_date:
+            guests_per_reservation[reservation['id']] = reservations_dao.get_guests_by_reservation(reservation['id'])
+        
+        reservation_info = {
+            'tour_date': reservation_date['tour_date'],
+            'start_time': reservation_date['start_time'],
+            "cancelled_people": reservation_date['cancelled_people'],
+            "reservations": reservation_tour_in_date,
+            "guests_per_reservation": guests_per_reservation,
+        }
+        cancelled_reservations.append(reservation_info)
 
     totals = {
         "upcoming_reservations": len(upcoming_reservations),
         "pending_reports": len(pending_reports_reservations),
-        "completed_reports": len(completed_reports_reservations)
+        "completed_reports": len(completed_reports_reservations),
     }
 
-    return render_template("tour_reservations.html", p_tour=db_tour, p_upcoming_reservations=upcoming_reservations, p_pending_reports_reservations=pending_reports_reservations, p_completed_reports_reservations=completed_reports_reservations, p_totals=totals, p_months=MONTHS)
+    return render_template("tour_reservations.html", p_tour=db_tour, p_upcoming_reservations=upcoming_reservations, p_pending_reports_reservations=pending_reports_reservations, p_completed_reports_reservations=completed_reports_reservations, p_cancelled_reservations=cancelled_reservations, p_totals=totals, p_months=MONTHS)
 
 @app.route("/tours/<int:tour_id>/report/<tour_date>")
 @login_required
@@ -583,15 +651,29 @@ def tour_report(tour_id, tour_date):
     if report:
         flash("Report already submitted for this tour and date", "warning")
         return redirect(url_for("tour_reservations", tour_id=tour_id))
+ 
+    try:
+        date.fromisoformat(tour_date)
+    except ValueError:
+        flash("Invalid date format", "danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
 
     reservation_dates = reservations_dao.get_dates_with_confirmed_reservations(tour_id, tour_date)
-    expected_people = 0
-    start_time = None
-    for reservation_date in reservation_dates:
-        if reservation_date['tour_date'] == tour_date:
-            expected_people += reservation_date['expected_people']
-            start_time = reservation_date['start_time']
-            break
+
+    if not reservation_dates:
+        flash("No confirmed reservations found for this tour and date", "danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
+    
+    reservation_dates_ok = reservation_dates[0]
+
+    start_datetime = datetime.fromisoformat(reservation_dates_ok['tour_date'] + " " + reservation_dates_ok['start_time'])
+    end_datetime = start_datetime + timedelta(minutes=db_tour['duration'])
+    if end_datetime > datetime.now():
+        flash("You can only submit a report after the tour has ended", "danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
+    
+    expected_people = reservation_dates_ok['expected_people']
+    start_time = reservation_dates_ok['start_time']
 
     return render_template("tour_report.html", p_tour=db_tour, p_tour_date=tour_date, p_start_time=start_time, p_expected_people=expected_people)
 
@@ -612,20 +694,51 @@ def submit_tour_report(tour_id, tour_date):
     if report:
         flash("Report already submitted for this tour and date", "warning")
         return redirect(url_for("tour_reservations", tour_id=tour_id))
-    
+        
+    try:
+        date.fromisoformat(tour_date)
+    except ValueError:
+        flash("Invalid date format", "danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
+
+    reservation_dates = reservations_dao.get_dates_with_confirmed_reservations(tour_id,tour_date)
+
+    if not reservation_dates:
+        flash("No confirmed reservations found for this tour and date","danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
+
+    reservation_date_ok = reservation_dates[0]
+
+    start_datetime = datetime.fromisoformat(reservation_date_ok["tour_date"]+ " "+ reservation_date_ok["start_time"])
+    end_datetime = start_datetime + timedelta(minutes=db_tour["duration"])
+    if end_datetime > datetime.now():
+        flash("You can only submit a report after the tour has ended","danger")
+        return redirect(url_for("tour_reservations", tour_id=tour_id))
+
     final_participants_count = request.form.get("final_participants_count", "").strip()
     if not final_participants_count:
         flash("Please provide the final number of participants", "danger")
         return redirect(url_for("tour_report", tour_id=tour_id, tour_date=tour_date))
 
-    final_participants_count = int(final_participants_count)
-    if final_participants_count < 0:
-        flash("Final number of participants cannot be negative", "danger")
+    expected_people = reservation_date_ok["expected_people"]
+    
+    try:
+        final_participants_count = int(final_participants_count)
+    except ValueError:
+        flash("Final participants count must be a valid number.", "danger")
         return redirect(url_for("tour_report", tour_id=tour_id, tour_date=tour_date))
     
-    group_img_path = None
+    if final_participants_count < 0 or final_participants_count > expected_people:
+        flash("Final number of participants cannot be negative and cannot exceed the number of expected participants.", "danger")
+        return redirect(url_for("tour_report", tour_id=tour_id, tour_date=tour_date))
+
     group_img = request.files.get('group_img')
+    group_img_path = None
     if group_img and group_img.filename != '':
+        if not is_allowed_image(group_img.filename):
+            flash("Invalid group image format. Allowed formats: png, jpg, jpeg, webp", "danger")
+            return redirect(url_for("tour_report", tour_id=tour_id, tour_date=tour_date))
+        
         filename_old = secure_filename(group_img.filename)
         filename_new = f"{int(time.time())}_{filename_old}"
         group_img_path = "images/reports/" + filename_new
@@ -651,7 +764,7 @@ def signup():
     role = request.args.get('role', 'participant')
     if role not in ("participant", "guide"):
         role = "participant"
-    return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = [])
+    return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = [], first_name='', last_name='', email='')
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -665,15 +778,16 @@ def register():
     role = request.form.get("role")   
 
     languages = request.form.getlist("languages")
-    selected_languages = []
-    for language in languages:
-        if language in LANGUAGES:
-            selected_languages.append(language)
+    selected_languages = [language for language in languages if language in LANGUAGES]
 
     if not first_name or not last_name or not email or not password or not role:
         flash("Please complete all the required fields", "danger")
         return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = selected_languages, first_name=first_name, last_name=last_name, email=email)
     
+    if len(first_name) > 80 or len(last_name) > 80:
+        flash("First name and last name cannot exceed 80 characters.", "danger")
+        return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = selected_languages, first_name=first_name, last_name=last_name, email=email)
+
     if role not in ("participant", "guide"):
         flash("Please select a valid role", "danger")
         return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = selected_languages, first_name=first_name, last_name=last_name, email=email)
@@ -689,13 +803,16 @@ def register():
     password = generate_password_hash(password, method='scrypt')
     
     profile_img = request.files.get('profile_img')
+    img_path = None
     if profile_img and profile_img.filename != '':
+        if not is_allowed_image(profile_img.filename):
+            flash("Invalid profile image format. Allowed formats: png, jpg, jpeg, webp", "danger")
+            return render_template("registration.html", p_languages=LANGUAGES, selected_role = role, selected_languages = selected_languages, first_name=first_name, last_name=last_name, email=email)
+        
         filename_old = secure_filename(profile_img.filename)
         filename_new = f"{int(time.time())}_{filename_old}"
         img_path = "images/profile_imgs/" + filename_new
         profile_img.save("static/" + img_path)
-    else:
-        img_path = None
 
     users_dao.new_user(first_name, last_name, email, password, role, img_path, selected_languages)
 
@@ -722,19 +839,19 @@ def authenticate():
     if not db_user or not check_password_hash(db_user['password'], password):
         flash("The user does not exist or the password is wrong", "danger")
         return redirect(url_for("login"))
-    else:
-        new = User(
-            id = db_user["id"],
-            first_name = db_user["first_name"],
-            last_name = db_user["last_name"],
-            email = db_user["email"],
-            password = db_user["password"],
-            role = db_user["role"],
-            profile_img = db_user["profile_img"]
-        )
+    
+    new = User(
+        id = db_user["id"],
+        first_name = db_user["first_name"],
+        last_name = db_user["last_name"],
+        email = db_user["email"],
+        password = db_user["password"],
+        role = db_user["role"],
+        profile_img = db_user["profile_img"]
+    )
 
-        login_user(new)
-        flash("Welcome back! " + db_user["first_name"] + " " + db_user["last_name"] + "!", "success")
+    login_user(new)
+    flash("Welcome back! " + db_user["first_name"] + " " + db_user["last_name"] + "!", "success")
     
     return redirect(url_for("profile"))
 
@@ -789,8 +906,8 @@ def profile_guide():
 
     db_tours = tours_dao.get_tours_by_guide(user.id)
     for tour in db_tours:
-        reservation_dates = reservations_dao.get_dates_with_confirmed_reservations_for_tour(tour['id'])
-        has_reservations = tours_dao.has_reservations(tour['id'])
+        reservation_dates = reservations_dao.get_dates_with_confirmed_reservations(tour['id'])
+        has_any_reservations = tours_dao.has_reservations(tour['id'])
         next_reservations = []
 
         #if tours have no reservations, the guide can delete them, otherwise not
@@ -811,7 +928,7 @@ def profile_guide():
 
         tours_data.append({
             'tour': tour, 
-            'has_reservations': has_reservations,
+            'has_any_reservations': has_any_reservations,
             'next_reservations': next_reservations[:5]  # Limit to first 5 upcoming reservations
             })
 
@@ -826,11 +943,11 @@ def profile_guide():
 @app.route("/profile/participant")
 @login_required
 def profile_participant():
-    if current_user.role != 'participant':
+    user = current_user
+    if user.role != 'participant':
         flash("Access denied: this page is only for participants", "danger")
         return redirect(url_for("home"))
     
-    user = current_user    
     current_datetime = datetime.now() 
 
     db_reservations = reservations_dao.get_reservations_for_participant(user.id)
@@ -898,19 +1015,40 @@ def profile_participant():
 @app.route("/admin")
 @login_required
 def admin():
-    if current_user.role != 'admin':
+    user = current_user
+    if user.role != 'admin':
         flash("Access denied: this page is only for administrators", "danger")
         return redirect(url_for("home"))
     
-    db_users = users_dao.get_users()
-    db_tours = tours_dao.get_tours()
     stats = {
         "count_guides": users_dao.count_guides(),
         "count_participants": users_dao.count_participants(),
         "count_tours": tours_dao.count_tours(),
-        "count_reservations": reservations_dao.count_reservations_confirmed()
+        "count_reservations": reservations_dao.count_reservations()
     }
-    reservations_by_lang = reservations_dao.reservations_by_language()
+
+    reservations_by_lang = reservations_dao.get_reservations_by_language()
+
+    guides_data = []
+
+    db_guides = users_dao.get_guides()
+    for guide in db_guides:
+        guide_tours = []
+        db_tours = tours_dao.get_tours_by_guide(guide['id'])
+
+        for tour in db_tours:
+            guide_tours.append({
+                'tour': tour,
+                'weekly_plan': tours_dao.get_tour_weekly_plan(tour['id']),
+                'stops': tours_dao.get_tour_stops(tour['id']),
+                'images': tours_dao.get_tour_images(tour['id']),
+            })
+
+        guides_data.append({
+            'guide': guide,
+            'languages': languages_dao.get_languages_by_guide(guide['id']),
+            'tours': guide_tours
+        })
     
-    return render_template("admin.html", p_users=db_users, p_tours=db_tours, p_stats=stats, p_reservations_by_lang=reservations_by_lang)
+    return render_template("admin.html", p_stats=stats, p_reservations_by_lang=reservations_by_lang, p_guides_data=guides_data, p_days=DAYS)
 
