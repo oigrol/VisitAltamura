@@ -1644,7 +1644,7 @@ h2 span {
 }
 
 .mini-occurrences strong {
-    color: var(--text-dark);
+    color: var(--text);
 }
 
 .profile-divisor {
@@ -2398,12 +2398,6 @@ h2 span {
     line-height: 1;
 }
 
-.admin-stat-trend {
-    color: var(--brand);
-    font-size: 1.1rem;
-    opacity: 0.6;
-}
-
 .admin-section-header {
     display: flex;
     align-items: flex-end;
@@ -2765,8 +2759,8 @@ h2 span {
     --surface-glass: rgba(26, 25, 21, 0.75);
     --line: rgba(232, 226, 217, 0.1);
     --shadow-small: 0 10px 26px rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
 }
-
 
 .dark-mode .form-control,
 .dark-mode .form-select {
@@ -2809,8 +2803,53 @@ h2 span {
     color: #70baf5;
 }
 
+.dark-mode .mini-occurrences,
+.dark-mode .reservation-card-side {
+    background: var(--bg-deep);
+}
 
+.dark-mode .reservation-card.pending .reservation-card-date {
+    background: linear-gradient(
+        160deg,
+        var(--brand-soft),
+        var(--bg-deep)
+    );
+}
 
+.dark-mode .reservation-status-confirmed,
+.dark-mode .status-upcoming {
+    background: rgba(70, 180, 125, 0.16);
+    color: #7dd8a0;
+}
+
+.dark-mode .reservation-status-cancelled {
+    background: rgba(220, 80, 80, 0.16);
+    color: #f1a0a0;
+}
+
+.dark-mode .admin-nav-danger {
+    color: #f1a0a0;
+}
+
+.dark-mode .admin-nav-danger:hover {
+    background: rgba(220, 80, 80, 0.14);
+    color: #ffb0b0;
+}
+
+.dark-mode .text-muted,
+.dark-mode .form-text {
+    color: var(--text-soft) !important;
+}
+
+.dark-mode .stats-section {
+    background: var(--bg-deep);
+    border-color: var(--line);
+}
+
+.dark-mode .tour-stop-number {
+    background: var(--bg-deep);
+    color: var(--text-soft);
+}
 
 @media (max-width: 768px) {
 
