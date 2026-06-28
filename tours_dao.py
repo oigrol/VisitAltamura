@@ -41,7 +41,7 @@ def get_tours_by_filters(p_date, p_language, p_duration):
         if isinstance(p_date, str):
             p_date = date.fromisoformat(p_date)
 
-        weekday = p_date.weekday()  # 0 = Monday, 6 = Sunday
+        weekday = p_date.weekday()
         query += " AND T.id IN (SELECT tour_id FROM tour_weekly_plan WHERE day_of_week = ?)"
         query_params += (weekday,)
     
@@ -157,7 +157,6 @@ def get_tours_by_guide(p_guide_id):
     return db_tours
 
 def has_reservations(p_tour_id):
-    # Check if a tour has any reservations
     query = "SELECT COUNT(*) FROM reservations WHERE tour_id = ?"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
@@ -174,7 +173,6 @@ def has_reservations(p_tour_id):
     return count > 0
 
 def has_confirmed_reservations(p_tour_id):
-    # Check if a tour has any confirmed reservations
     query = "SELECT COUNT(*) FROM reservations WHERE tour_id = ? AND status = 'confirmed'"
 
     conn = sqlite3.connect("VisitAltamura_db.db")
@@ -231,7 +229,6 @@ def update_tour_with_reservations(p_tour_id, p_title, p_description):
     conn.close()
 
 def delete_tour(p_tour_id):
-    #Deletes a tour only if it has never received a reservation.
     has_res = has_reservations(p_tour_id)
 
     if has_res:

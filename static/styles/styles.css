@@ -44,7 +44,10 @@ img {
 }
 
 #tours,
-#our-city {
+#our-city,
+#section-stats,
+#section-languages,
+#section-guides {
     scroll-margin-top: 100px;
 }
 
@@ -127,6 +130,34 @@ h2 span {
 
 .reveal-delay-6 {
     animation-delay: 1.80s;
+}
+
+.flash-wrapper {
+    left: 0;
+    margin-top: 1rem;
+    position: fixed;
+    right: 0;
+    top: 86px;
+    z-index: 1200;
+}
+
+.alert {
+    border-radius: 16px;
+    margin-left: auto;
+    max-width: 620px;
+}
+
+.pills {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.34rem 0.72rem;
 }
 
 
@@ -284,38 +315,11 @@ h2 span {
     color: var(--brand);
 }
 
-.flash-wrapper {
-    left: 0;
-    margin-top: 1rem;
-    position: fixed;
-    right: 0;
-    top: 86px;
-    z-index: 1200;
-}
-
-.alert {
-    border-radius: 16px;
-    margin-left: auto;
-    max-width: 620px;
-}
-
-.pills {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: var(--bg);
-    color: var(--text-soft);
-    font-size: 0.82rem;
-    font-weight: 700;
-    padding: 0.34rem 0.72rem;
-}
 
 /* HOME PAGE */
 
 .hero-home {
-    background: linear-gradient(90deg, rgba(24, 34, 30, .94), rgba(24, 34, 30, .55) 58%, rgba(24, 34, 30, .22)), url('../images/cathedral-hero.webp') center/cover;
+    background: linear-gradient(90deg, rgba(24, 34, 30, 0.94), rgba(24, 34, 30, 0.55) 58%, rgba(24, 34, 30, 0.22)), url('../images/cathedral-hero.webp') center/cover;
     color: var(--text-white);
     min-height: 700px;
     overflow: hidden;
@@ -603,11 +607,7 @@ h2 span {
 }
 
 .tour-card-overlay {
-    background:
-        linear-gradient(180deg,
-            rgba(24, 34, 30, 0.1) 20%,
-            rgba(24, 34, 30, 0.5) 50%,
-            rgba(24, 34, 30, 0.94) 100%);
+    background: linear-gradient(180deg, rgba(24, 34, 30, 0.1) 20%, rgba(24, 34, 30, 0.5) 50%, rgba(24, 34, 30, 0.94) 100%);
     inset: 0;
     position: absolute;
 }
@@ -827,6 +827,8 @@ h2 span {
     margin: 0.5rem 0 0;
     max-width: 700px;
 }
+
+/* REGISTER / LOGIN PAGE */
 
 .form-card {
     background: var(--bg-soft);
@@ -1444,7 +1446,8 @@ h2 span {
     margin: 0;
 }
 
-/* PROFILE PAGE */
+
+/* PROFILE GUIDE/PARTICIPANT PAGE */
 
 .profile-section,
 .report-section,
@@ -1782,6 +1785,9 @@ h2 span {
     cursor: not-allowed;
 }
 
+
+/* NEW TOUR / EDIT TOUR PAGE */
+
 .form-page {
     display: grid;
     grid-template-columns: 1fr 1.6fr;
@@ -1912,6 +1918,9 @@ h2 span {
     color: var(--text-soft);
     margin-top: 0.2rem;
 }
+
+
+/* RESERVATION / REPORT PAGE */
 
 .reservation-header-content,
 .report-header-content {
@@ -2385,7 +2394,7 @@ h2 span {
     min-width: 0;
 }
 
-.admin-stat-label {
+.admin-stat-title {
     display: block;
     font-size: 0.78rem;
     font-weight: 600;
@@ -2455,7 +2464,7 @@ h2 span {
     height: 100%;
     background: linear-gradient(90deg, var(--brand-soft-2), var(--brand));
     border-radius: 99px;
-    transition: width 0.6s cubic-bezier(.4, 0, .2, 1);
+    transition: width 0.6s ease;
 }
 
 .admin-lang-nums {
@@ -2709,13 +2718,13 @@ h2 span {
     padding-left: 1.2rem;
 }
 
-.admin-stop-list li+li {
+.admin-stop-list li:not(:first-child) {
     margin-top: 0.45rem;
 }
 
 .admin-tour-images {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 0.65rem;
 }
 

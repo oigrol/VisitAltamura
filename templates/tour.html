@@ -18,7 +18,6 @@
             {% endif %}
 
             <div class="row g-4 align-items-end">
-
                 <div class="col-lg-9">
                     <p class="tour-detail reveal reveal-delay-2">
                         <i class="bi bi-geo-alt-fill icon"></i>
@@ -54,7 +53,6 @@
                             {{ p_guide.last_name[0] }}
                         </span>
                         {% endif %}
-
                         <div>
                             <p>Local guide</p>
                             <strong>
@@ -70,7 +68,8 @@
 
     <section class="pt-4">
         <div class="container-xl">
-            <div id="tourCarousel" class="carousel slide tour-carousel reveal reveal-delay-6" data-bs-ride="carousel" data-bs-interval="3000">
+            <div id="tourCarousel" class="carousel slide tour-carousel reveal reveal-delay-6" data-bs-ride="carousel"
+                data-bs-interval="3000">
                 <div class="carousel-indicators">
                     {% for path_img in p_images %}
                     <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="{{ loop.index0 }}"
@@ -203,7 +202,6 @@
                             </div>
                             {% endfor %}
                         </div>
-
                         {% else %}
                         <div class="tour-empty">
                             <i class="bi bi-calendar-x"></i>
@@ -249,7 +247,6 @@
                                 </li>
                                 {% endfor %}
                             </ol>
-
                             {% else %}
                             <div class="tour-empty">
                                 <i class="bi bi-signpost"></i>
@@ -258,7 +255,6 @@
                                 </p>
                             </div>
                             {% endif %}
-
                         </div>
                     </section>
 
@@ -272,17 +268,14 @@
                             {{ p_guide.last_name[0] }}
                         </span>
                         {% endif %}
-
                         <div>
                             <p class="tour-section-label">
                                 Your local guide
                             </p>
-
                             <h2>
                                 {{ p_guide.first_name }}
                                 {{ p_guide.last_name }}
                             </h2>
-
                             <p class="tour-guide-description">
                                 Discover Altamura with a local guide who
                                 knows its history, traditions and hidden
@@ -294,12 +287,9 @@
 
                 <div class="col-lg-5">
                     <aside id="booking" class="tour-booking-card reveal reveal-delay-2">
-
                         <p class="tour-section-label">
                             Free walking tour
                         </p>
-
-
                         <h2 class="tour-booking-title">
                             {% if current_user.is_authenticated and (current_user.role == 'participant' or
                             (current_user.role == 'guide' and not current_user.id == p_tour.guide_id)) %}
@@ -333,7 +323,6 @@
                                 <span>MEETING POINT</span>
                                 <strong> {{ p_tour.meeting_point }} </strong>
                             </div>
-
                         </div>
 
                         <div class="tour-booking-detail">
@@ -342,13 +331,11 @@
                                 <span>DURATION</span>
                                 <strong>{{ p_tour.duration }} minutes</strong>
                             </div>
-
                         </div>
 
                         {% if current_user.is_authenticated and current_user.role == 'participant' %}
                         {% if p_upcoming_dates %}
                         <form method="post" action="{{ url_for('reserve_tour', tour_id=p_tour.id) }}" class="mt-4">
-
                             <div class="mb-3">
                                 <label class="form-label" for="tour_date">Select a date</label>
                                 <select class="form-select" id="tour_date" name="tour_date" required>
@@ -369,7 +356,6 @@
                                     <option value="2">Me + 2 guests</option>
                                     <option value="3">Me + 3 guests</option>
                                 </select>
-
                                 <div id="guest-fields" class="mb-3"></div>
                             </div>
 
@@ -381,8 +367,8 @@
                         <p class="text-muted mt-3 small">No upcoming dates available for this tour right now.</p>
                         {% endif %}
 
-                        {% elif current_user.is_authenticated and (current_user.role == 'guide' and not current_user.id
-                        == p_tour.guide_id) %}
+                        {% elif current_user.is_authenticated and (current_user.role == 'guide' and not
+                        current_user.id== p_tour.guide_id) %}
                         <span class="btn-blocked">
                             <button class="btn btn-brand tour-booking-button" type="button" disabled>
                                 Guides cannot book tours
@@ -400,7 +386,8 @@
                             <a href="{{ url_for('tour_reservations', tour_id=p_tour.id) }}" class="btn btn-brand">
                                 <i class="bi bi-list-check me-1"></i>View reservations
                             </a>
-                            <a href="{{ url_for('edit_tour', tour_id=p_tour.id) }}" class="btn btn-outline-brand colored">
+                            <a href="{{ url_for('edit_tour', tour_id=p_tour.id) }}"
+                                class="btn btn-outline-brand colored">
                                 <i class="bi bi-pencil me-1"></i>Edit tour
                             </a>
                             {% if not p_has_reservations %}
@@ -435,7 +422,6 @@
                                 <i class="bi bi-person-check"></i>
                                 Up to 4 people per reservation
                             </span>
-
                             <span>
                                 <i class="bi bi-x-circle"></i>
                                 Cancellation up to 24 hours before
@@ -447,5 +433,4 @@
         </div>
     </section>
 </div>
-
 {% endblock %}

@@ -61,7 +61,6 @@ if (addStopButton && stopsContainer) {
 
 // delete confirmation
 const deleteForms = document.querySelectorAll('.delete-form');
-//con queryselectorall non serve controllo if perchè se non ci sono form non entra nel ciclo for
 for (const form of deleteForms) {
     form.addEventListener('submit', function (event) {
         const title = this.getAttribute('data-title');
@@ -71,7 +70,6 @@ for (const form of deleteForms) {
         }
     });
 }
-
 
 // smooth scrolling and active link highlighting
 document.querySelectorAll('.nav-link').forEach(link => {
@@ -99,11 +97,9 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-
 // dark mode toggle
 const btnTheme = document.querySelector('#btn-theme');
 if (btnTheme) {
-    // Ripristina preferenza salvata
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         btnTheme.querySelector('i').className = 'bi bi-sun';
@@ -116,7 +112,7 @@ if (btnTheme) {
     });
 }
 
-
+/* reveal elements on scroll */
 const revealElements = document.querySelectorAll('.reveal');
 
 if (revealElements.length > 0) {

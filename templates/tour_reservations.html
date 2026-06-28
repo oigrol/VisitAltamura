@@ -18,6 +18,7 @@
                     <span class="pills"><i class="bi bi-people"></i> max {{ p_tour.max_participants }}</span>
                 </div>
             </div>
+
             <div class="reservation-header-actions">
                 <a href="{{ url_for('tour', tour_id=p_tour.id) }}" class="btn btn-link-brand">
                     <i class="bi bi-eye me-1"></i>View tour
@@ -46,7 +47,6 @@
                         <span>Pending reports</span>
                         <strong> {{ p_totals.pending_reports }}</strong>
                     </div>
-
                 </article>
             </div>
 
@@ -73,7 +73,6 @@
             <div class="d-flex flex-column gap-2 mb-5">
                 {% for reservation in p_upcoming_reservations %}
                 <article class="reservation-card reveal reveal-delay-2">
-
                     <div class="reservation-card-date">
                         <span class="day">{{ reservation.tour_date[8:10] }}</span>
                         <span class="month">{{ p_months[reservation.tour_date[5:7] | int] }}</span>
@@ -85,7 +84,6 @@
                                 <i class="bi bi-clock"></i>
                                 {{ reservation.start_time }}
                             </span>
-
                             <span>
                                 <i class="bi bi-people"></i>
                                 {{ reservation.expected_people }} / {{ p_tour.max_participants }} people booked
@@ -99,7 +97,6 @@
                                     {{ reservation.expected_people }} of {{ p_tour.max_participants }} places
                                 </strong>
                             </div>
-
                             <div class="reservation-card-people-bar" role="progressbar">
                                 <span
                                     style="width: {{ (reservation.expected_people * 100 / p_tour.max_participants) | round(0) }}%;"></span>
@@ -109,7 +106,6 @@
                         <div class="reservation-card-guests">
                             {% for res in reservation.reservations %}
                             {% set guests = reservation.guests_per_reservation[res.id] %}
-
                             <div class="reservation-card-guests-block">
                                 <div class="reservation-card-guests-avatar">
                                     {{ res.participant_first_name[0] }}{{ res.participant_last_name[0] }}
@@ -135,7 +131,6 @@
                                     {% endif %}
                                 </div>
                             </div>
-
                             {% else %}
                             <p class="reservation-card-guests-empty">
                                 No confirmed participants yet.
@@ -149,14 +144,11 @@
                             <i class="bi bi-calendar-check"></i>
                             Upcoming
                         </span>
-
                         <small>No action required</small>
                     </div>
-
                 </article>
                 {% endfor %}
             </div>
-
             {% else %}
             <div class="no-found reservations-empty-state reveal reveal-delay-2 mb-5">
                 <i class="bi bi-calendar-x no-found-icon mb-2"></i>
@@ -182,7 +174,6 @@
             <div class="d-flex flex-column gap-2 mb-5">
                 {% for reservation in p_pending_reports_reservations %}
                 <article class="reservation-card upcoming reveal reveal-delay-2">
-
                     <div class="reservation-card-date">
                         <span class="day">{{ reservation.tour_date[8:10] }}</span>
                         <span class="month">{{ p_months[reservation.tour_date[5:7] | int] }}</span>
@@ -194,7 +185,6 @@
                                 <i class="bi bi-clock"></i>
                                 {{ reservation.start_time }}
                             </span>
-
                             <span>
                                 <i class="bi bi-people"></i>
                                 {{ reservation.expected_people }} people expected
@@ -208,18 +198,15 @@
                                     {{ reservation.expected_people }} of {{ p_tour.max_participants }} places
                                 </strong>
                             </div>
-
                             <div class="reservation-card-people-bar" role="progressbar">
                                 <span
                                     style="width: {{ (reservation.expected_people * 100 / p_tour.max_participants) | round(0) }}%;"></span>
                             </div>
                         </div>
 
-
                         <div class="reservation-card-guests">
                             {% for res in reservation.reservations %}
                             {% set guests = reservation.guests_per_reservation[res.id] %}
-
                             <div class="reservation-card-guests-block">
                                 <div class="reservation-card-guests-avatar">
                                     {{ res.participant_first_name[0] }}{{ res.participant_last_name[0] }}
@@ -245,7 +232,6 @@
                                     {% endif %}
                                 </div>
                             </div>
-
                             {% else %}
                             <p class="reservation-card-guests-empty">
                                 No confirmed participants yet.
@@ -259,7 +245,6 @@
                             <i class="bi bi-exclamation-circle"></i>
                             Missing
                         </span>
-
                         <a href="{{ url_for('tour_report', tour_id=p_tour.id, tour_date=reservation.tour_date) }}"
                             class="btn btn-brand w-100">
                             <i class="bi bi-pencil-square me-1"></i>
@@ -314,7 +299,6 @@
                 </article>
                 {% endfor %}
             </div>
-
             {% else %}
             <div class="no-found reveal reveal-delay-2 p-4 mb-5">
                 <i class="bi bi-image no-found-icon mb-2"></i>
@@ -340,7 +324,6 @@
             <div class="d-flex flex-column gap-2 mb-5">
                 {% for reservation in p_cancelled_reservations %}
                 <article class="reservation-card reveal reveal-delay-2">
-
                     <div class="reservation-card-date">
                         <span class="day">{{ reservation.tour_date[8:10] }}</span>
                         <span class="month">{{ p_months[reservation.tour_date[5:7] | int] }}</span>
@@ -352,7 +335,6 @@
                                 <i class="bi bi-clock"></i>
                                 {{ reservation.start_time }}
                             </span>
-
                             <span>
                                 <i class="bi bi-people"></i>
                                 {{ reservation.cancelled_people }}
@@ -367,7 +349,6 @@
                         <div class="reservation-card-guests">
                             {% for res in reservation.reservations %}
                             {% set guests = reservation.guests_per_reservation[res.id] %}
-
                             <div class="reservation-card-guests-block">
                                 <div class="reservation-card-guests-avatar">
                                     {{ res.participant_first_name[0] }}{{ res.participant_last_name[0] }}
@@ -394,7 +375,6 @@
                                     {% endif %}
                                 </div>
                             </div>
-
                             {% else %}
                             <p class="reservation-card-guests-empty">
                                 No cancelled reservations found for this date.
@@ -408,10 +388,8 @@
                             <i class="bi bi-x-circle"></i>
                             Cancelled
                         </span>
-
                         <small>Does not occupy any places</small>
                     </div>
-
                 </article>
                 {% endfor %}
             </div>

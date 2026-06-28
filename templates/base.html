@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Visit Altamura{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
 
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
 
@@ -30,7 +30,6 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <!-- ensures footer is at the bottom of the page even if content is short -->
 
     <div class="bg-effect bg-effect-1"></div>
     <div class="bg-effect bg-effect-2"></div>
@@ -38,7 +37,6 @@
     <header class="header-site">
         <nav class="navbar">
             <div class="container-xl">
-
                 <a class="navbar-brand" href="{{ url_for('home') }}">
                     <img src="{{ url_for('static', filename='images/Logo_VisitAltamura.png') }}"
                         alt="VisitAltamura logo">
@@ -96,7 +94,6 @@
         </nav>
     </header>
 
-
     <div class="flash-wrapper container-xl">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -110,7 +107,7 @@
         {% endwith %}
     </div>
 
-    <main class="flex-grow-1"> <!-- allows main content to grow and push footer to the bottom -->
+    <main class="flex-grow-1">
         {% block content %}
         {% endblock %}
     </main>
@@ -131,7 +128,6 @@
 
                 <section class="col-md-4">
                     <h6 class="footer-title">Navigation</h6>
-
                     <a class="d-block footer-link mb-1" href="{{ url_for('home') }}"> Home </a>
                     <a class="d-block footer-link mb-1" href="{{ url_for('home') }}#tours"> Explore tours </a>
                     <a class="d-block footer-link" href="{{ url_for('home') }}#our-city"> Our city </a>
@@ -150,7 +146,6 @@
             <hr class="my-4">
 
             <small class="footer-text"> © 2026 VisitAltamura — Discover the city, one story at a time. </small>
-
         </div>
     </footer>
 
@@ -166,5 +161,4 @@
         {% endif %}
     </nav>
 </body>
-
 </html>

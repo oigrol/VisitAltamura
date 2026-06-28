@@ -28,12 +28,10 @@ Report — {{ p_tour.title }} - Visit Altamura
             <div class="col-12 col-lg-4 reveal reveal-delay-2">
                 <div class="form-page-title">
                     <p class="section-badge mb-2">Complete your report</p>
-
                     <h1>
                         Declare tour<br>
                         <span>results.</span>
                     </h1>
-
                     <p>
                         {{ p_expected_people }} participant(s) had reserved a place for this date.
                         Please declare how many actually showed up and upload a group photo as evidence.
@@ -48,7 +46,6 @@ Report — {{ p_tour.title }} - Visit Altamura
                         <form method="post"
                             action="{{ url_for('submit_tour_report', tour_id=p_tour.id, tour_date=p_tour_date) }}"
                             enctype="multipart/form-data">
-
                             <div class="mb-4">
                                 <label class="form-label" for="final_participants">
                                     Effective number of participants
@@ -64,7 +61,6 @@ Report — {{ p_tour.title }} - Visit Altamura
                                 <label class="form-label" for="group_img">
                                     Group photo
                                 </label>
-
                                 <input class="form-control" type="file" id="group_img" name="group_img"
                                     accept=".jpg,.jpeg,.png,.webp" required>
                                 <div class="form-text">Upload a photo showing the participants as proof that the tour

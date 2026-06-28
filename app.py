@@ -30,7 +30,6 @@ def get_upcoming_dates(p_weekly_plan):
     today = date.today()
     current_datetime = datetime.now()
 
-    #controllo i prossimi 91 giorni (13 settimane) per trovare le date corrispondenti al piano settimanale del tour
     p_weeks_end=13
     p_days_end = p_weeks_end * 7
     for i in range(p_days_end): 
@@ -49,7 +48,6 @@ def get_upcoming_dates(p_weekly_plan):
                 "day_of_week": DAYS[day_of_week],
                 "start_time": plan['start_time']
             })
-
             break
 
     return upcoming_dates
@@ -72,7 +70,6 @@ def is_allowed_time(p_time):
 def home():
     today = date.today().isoformat()
 
-    #prende i filtri dalla query string (stringa URL), se presenti, altrimenti li imposta a stringa vuota
     filter_date = request.args.get('date', '').strip()
     filter_language = request.args.get('language', '').strip()
     filter_duration = request.args.get('duration', '').strip()
@@ -85,7 +82,6 @@ def home():
                 filter_date = ''
         except ValueError:
             filter_date = ''
-
 
     if filter_language not in LANGUAGES:
         filter_language = ''
@@ -252,7 +248,6 @@ def create_tour():
     flash("Tour created successfully!", "success")
     return redirect(url_for("profile_guide"))
     
-
 @app.route("/tours/<int:tour_id>/edit")
 @login_required
 def edit_tour(tour_id):
@@ -300,7 +295,6 @@ def update_tour(tour_id):
         flash("Tour updated successfully!", "success")
         return redirect(url_for("profile_guide"))
     
-    # If the tour has no reservations, allow updating all fields
     language = request.form.get("language", "").strip()
     duration = request.form.get("duration", "").strip()
     meeting_point = request.form.get("meeting_point", "").strip()
@@ -312,7 +306,7 @@ def update_tour(tour_id):
     
     if len(title) > 120 or len(meeting_point) > 200:
         flash("Title cannot exceed 120 characters and meeting point cannot exceed 200 characters.", "danger")
-        return redirect(url_for("new_tour"))
+        return redirect(url_for("edit_tour", tour_id=tour_id))
     
     try:
         duration = int(duration)
@@ -411,6 +405,7 @@ def delete_tour(tour_id):
 
 
 # --- Reservations ---
+
 @app.route("/tours/<int:tour_id>/reserve", methods=["POST"])
 @login_required
 def reserve_tour(tour_id):
@@ -552,8 +547,6 @@ def cancel_reservation(reservation_id):
     flash("Reservation cancelled successfully", "success")
     return redirect(url_for("profile_participant"))
 
-
-# --- Reservation ---
 @app.route("/tours/<int:tour_id>/reservations")
 @login_required
 def tour_reservations(tour_id):
@@ -632,6 +625,9 @@ def tour_reservations(tour_id):
     }
 
     return render_template("tour_reservations.html", p_tour=db_tour, p_upcoming_reservations=upcoming_reservations, p_pending_reports_reservations=pending_reports_reservations, p_completed_reports_reservations=completed_reports_reservations, p_cancelled_reservations=cancelled_reservations, p_totals=totals, p_months=MONTHS)
+
+
+# --- Tour Report ---
 
 @app.route("/tours/<int:tour_id>/report/<tour_date>")
 @login_required
@@ -834,7 +830,6 @@ def authenticate():
     password = request.form.get("password", "")
     db_user = users_dao.get_user_by_email(email)
 
-    #per evitare che il malintenzionato possa capire se l'email esiste o meno, si fa un controllo combinato: se l'utente non esiste o la password non corrisponde, si mostra lo stesso messaggio di errore
     if not db_user or not check_password_hash(db_user['password'], password):
         flash("The user does not exist or the password is wrong", "danger")
         return redirect(url_for("login"))
@@ -879,6 +874,9 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for("home"))
 
+
+# --- Profile ---
+
 @app.route("/profile")
 @login_required
 def profile():
@@ -911,8 +909,6 @@ def profile_guide():
         has_any_reservations = tours_dao.has_reservations(tour['id'])
         next_reservations = []
 
-        #if tours have no reservations, the guide can delete them, otherwise not
-
         for reservation_date in reservation_dates:
             tour_date = reservation_date['tour_date']
             tour_start_time = reservation_date['start_time']
@@ -930,7 +926,7 @@ def profile_guide():
         tours_data.append({
             'tour': tour, 
             'has_any_reservations': has_any_reservations,
-            'next_reservations': next_reservations[:5]  # Limit to first 5 upcoming reservations
+            'next_reservations': next_reservations[:5]
             })
 
     totals = {
@@ -960,7 +956,6 @@ def profile_participant():
     number_completed_reservations = 0
     for reservation in db_reservations: 
         guests = reservations_dao.get_guests_by_reservation(reservation["id"])
-        #un tour può avere al massimo un orario di partenza per ogni giorno della settimana.
         tour_weekday = date.fromisoformat(reservation["tour_date"]).weekday()
         weekly_plan = tours_dao.get_tour_weekly_plan(reservation["tour_id"])
         start_time = None
@@ -969,7 +964,6 @@ def profile_participant():
                 start_time = plan["start_time"]
                 break
             
-        #24h before the tour start time, the participant can cancel the reservation
         cancellable = False
         if start_time is not None:
             tour_datetime = datetime.fromisoformat(reservation["tour_date"] + " " + start_time)
@@ -985,7 +979,6 @@ def profile_participant():
             elif reservation["status"] == "confirmed":
                 if tour_datetime > current_datetime:
                     cancellable = (tour_datetime - current_datetime >= timedelta(hours=24))
-                    #timedelta is the difference between two datetime objects, and we check if it's greater than or equal to 24 hours
                     upcoming_reservations.append({
                         "reservation": reservation,
                         "guests": guests,
@@ -1003,7 +996,6 @@ def profile_participant():
                     })
                     number_completed_reservations += 1
 
-
     totals = {
         "upcoming": number_upcoming_reservations,
         "people": number_people, 
@@ -1012,6 +1004,8 @@ def profile_participant():
     
     return render_template("profile_participant.html", p_participant=user, p_totals=totals, p_upcoming_reservations=upcoming_reservations, p_reservation_history=history_reservations)
 
+
+# --- Admin ---
 
 @app.route("/admin")
 @login_required
@@ -1052,4 +1046,3 @@ def admin():
         })
     
     return render_template("admin.html", p_stats=stats, p_reservations_by_lang=reservations_by_lang, p_guides_data=guides_data, p_days=DAYS)
-

@@ -14,7 +14,7 @@ def new_user(p_first_name, p_last_name, p_email, p_password, p_role, p_profile_i
     else:   
         cursor.execute(query, (p_first_name, p_last_name, p_email, p_password, p_role, p_profile_img))
 
-    user_id = cursor.lastrowid # Get the ID of the newly inserted user
+    user_id = cursor.lastrowid
     if p_role == "guide":
         for language in p_languages:
             cursor.execute("INSERT INTO guide_languages (guide_id, language) VALUES (?,?)", (user_id, language))
@@ -22,23 +22,6 @@ def new_user(p_first_name, p_last_name, p_email, p_password, p_role, p_profile_i
     cursor.close()
     conn.close()
     return user_id
-
-def get_users():
-    query = "SELECT * FROM users ORDER BY last_name, first_name"
-
-    conn = sqlite3.connect("VisitAltamura_db.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute(query)
-
-    db_users = cursor.fetchall()
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return db_users
 
 def get_guides():
     query = "SELECT * FROM users WHERE role = 'guide' ORDER BY last_name, first_name"
