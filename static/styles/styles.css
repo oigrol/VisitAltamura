@@ -270,6 +270,7 @@ h2 span {
     transform: translateY(-1px);
 }
 
+/* to remove */
 .link-brand {
     color: var(--brand);
     font-weight: 700;
@@ -282,6 +283,7 @@ h2 span {
     color: var(--brand-dark);
     text-decoration: underline;
 }
+/*to remove */
 
 .footer-site {
     border-top: 1px solid var(--line);

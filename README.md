@@ -24,7 +24,7 @@ The application is designed primarily for desktop browsers and includes some res
 PythonAnywhere URL:
 
 ```text
-TODO: insert the deployed PythonAnywhere URL before submission
+s322424Giovanni.pythonanywhere.com
 ```
 
 ## Local Test Instructions
